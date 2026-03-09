@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduBot AI | Daxshat Platforma</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:#0a0a0f;background-image:url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80");background-size:cover;background-position:center;background-attachment:fixed;color:#fff;overflow-x:hidden}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes levelUp{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+    .daxshat-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;overflow:hidden;background:rgba(5,5,15,0.75)}
+    .daxshat-bg::before{content:'';position:absolute;width:200%;height:200%;background:radial-gradient(circle at 20% 50%,rgba(0,255,136,.1) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(255,0,255,.1) 0%,transparent 50%);animation:spin 60s linear infinite}
+    .particle{position:absolute;width:4px;height:4px;background:#00ff88;border-radius:50%;opacity:.3;animation:float 6s infinite}
+    .neon-text{background:linear-gradient(135deg,#00ff88,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(0,255,136,.5))}
+    .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .auth-card{background:rgba(20,20,30,.9);backdrop-filter:blur(20px);border:2px solid rgba(0,255,136,.3);border-radius:40px;padding:50px;width:100%;max-width:480px;box-shadow:0 0 50px rgba(0,255,136,.3);animation:fadeIn .5s ease}
+    .auth-logo h1{font-size:2.5rem;margin-bottom:5px}
+    .auth-logo p{color:#888;margin-bottom:30px}
+    .auth-tabs{display:flex;gap:10px;margin-bottom:30px;background:rgba(255,255,255,.05);border-radius:20px;padding:5px}
+    .auth-tab{flex:1;padding:12px;border:none;background:transparent;color:#888;cursor:pointer;border-radius:15px;font-size:1rem;font-weight:700;transition:.3s}
+    .auth-tab.active{background:linear-gradient(135deg,#00ff88,#00cc66);color:#000}
+    .input-group{margin-bottom:20px}
+    .input-group label{display:block;color:#888;margin-bottom:8px;font-size:.85rem;letter-spacing:1px}
+    .input-group input{width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(0,255,136,.2);border-radius:15px;padding:15px 20px;color:#fff;font-size:1rem;outline:none;transition:.3s}
+    .input-group input:focus{border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,.2)}
+    .daxshat-btn{width:100%;padding:18px;background:linear-gradient(135deg,#00ff88,#ff00ff);border:none;border-radius:20px;color:#000;font-size:1.1rem;font-weight:900;cursor:pointer;transition:.3s}
+    .daxshat-btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,255,136,.4)}
+    .daxshat-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .error-msg{background:rgba(255,50,50,.1);border:1px solid rgba(255,50,50,.3);color:#ff6666;padding:12px 20px;border-radius:12px;margin-bottom:20px;display:none}
+    .demo-info{text-align:center;margin-top:20px;color:#555;font-size:.85rem}
+    .app{display:none}
+    .sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:rgba(10,10,20,.95);border-right:2px solid rgba(0,255,136,.2);padding:25px;overflow-y:auto;z-index:100}
+    .sidebar-logo h2{color:#00ff88;font-size:1.5rem}
+    .sidebar-logo p{color:#555;font-size:.8rem;margin-top:3px}
+    .sidebar-nav{margin-top:40px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:15px;color:#888;margin-bottom:5px;cursor:pointer;transition:.3s;border:none;background:transparent;width:100%;font-size:1rem}
+    .nav-item:hover,.nav-item.active{background:rgba(0,255,136,.1);color:#00ff88}
+    .nav-icon{font-size:1.3rem}
+    .sidebar-user{position:absolute;bottom:25px;left:25px;right:25px;display:flex;align-items:center;gap:12px;padding:15px;background:rgba(0,255,136,.05);border-radius:15px;border:1px solid rgba(0,255,136,.2)}
+    .user-avatar{width:45px;height:45px;background:linear-gradient(135deg,#00ff88,#ff00ff);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1.2rem;flex-shrink:0}
+    .user-info h4{color:#00ff88;font-size:.9rem}
+    .user-info p{color:#555;font-size:.75rem}
+    .main{margin-left:260px;min-height:100vh;padding:30px}
+    .page{display:none;animation:fadeIn .3s ease}
+    .page.active{display:block}
+    .page-title{font-size:2.5rem;font-weight:900;margin-bottom:30px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:40px}
+    .stat-card{background:rgba(20,20,30,.8);border:2px solid rgba(0,255,136,.2);border-radius:25px;padding:25px;transition:.3s}
+    .stat-card:hover{border-color:#00ff88;transform:translateY(-5px)}
+    .stat-label{color:#888;font-size:.85rem;margin-bottom:10px}
+    .stat-value{font-size:2.5rem;font-weight:900;color:#00ff88}
+    .stat-sub{color:#555;font-size:.8rem;margin-top:5px}
+    .courses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .course-card{background:rgba(20,20,30,.8);border:2px solid rgba(0,255,136,.15);border-radius:25px;overflow:hidden;transition:.3s;cursor:pointer}
+    .course-card:hover{border-color:#00ff88;transform:translateY(-5px)}
+    .course-thumb img{width:100%;height:160px;object-fit:cover}
+    .course-body{padding:20px}
+    .course-cat{color:#00ff88;font-size:.75rem;font-weight:700;margin-bottom:8px}
+    .course-title{font-size:1.1rem;font-weight:700;margin-bottom:12px}
+    .course-meta{display:flex;gap:15px;color:#666;font-size:.8rem;margin-bottom:15px}
+    .progress-bar{background:rgba(255,255,255,.1);border-radius:100px;height:8px}
+    .progress-fill{height:8px;border-radius:100px;background:linear-gradient(90deg,#00ff88,#ff00ff);transition:width .5s ease}
+    .progress-text{color:#00ff88;font-size:.8rem;margin-top:8px;font-weight:700}
+    .level-badge{display:inline-block;background:linear-gradient(135deg,#ff00ff,#cc00cc);color:#fff;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:700;margin-top:8px}
+    .course-detail{background:rgba(20,20,30,.9);border:2px solid rgba(0,255,136,.3);border-radius:30px;padding:40px;animation:fadeIn .3s ease}
+    .back-btn{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:#00ff88;padding:10px 20px;border-radius:12px;cursor:pointer;font-size:.9rem;margin-bottom:30px;transition:.3s}
+    .back-btn:hover{background:rgba(0,255,136,.2)}
+    .lesson-list{display:flex;flex-direction:column;gap:15px;margin:25px 0}
+    .lesson-item{background:rgba(255,255,255,.03);border:2px solid rgba(255,255,255,.1);border-radius:20px;padding:20px 25px;display:flex;align-items:center;gap:20px;transition:.3s;cursor:pointer}
+    .lesson-item:hover{border-color:#00ff88;background:rgba(0,255,136,.05)}
+    .lesson-item.completed{border-color:rgba(0,255,136,.5);background:rgba(0,255,136,.08)}
+    .lesson-item.locked{opacity:.4;cursor:not-allowed}
+    .lesson-num{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#ff00ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;flex-shrink:0}
+    .lesson-info{flex:1}
+    .lesson-title{font-weight:700;margin-bottom:4px}
+    .lesson-meta{color:#666;font-size:.85rem}
+    .lesson-status{font-size:1.5rem}
+    /* QUIZ */
+    .quiz-wrap{max-width:700px;margin:0 auto}
+    .quiz-box{background:rgba(20,20,30,.9);border:2px solid rgba(0,255,136,.3);border-radius:30px;padding:40px;animation:fadeIn .3s ease}
+    .quiz-prog-bar{background:rgba(255,255,255,.1);border-radius:100px;height:10px;margin-bottom:25px}
+    .quiz-prog-fill{height:10px;border-radius:100px;background:linear-gradient(90deg,#00ff88,#ff00ff);transition:width .5s}
+    .quiz-q{font-size:1.5rem;font-weight:700;margin-bottom:10px;line-height:1.5}
+    .quiz-hint{color:#888;font-size:.95rem;margin-bottom:25px;padding:12px 18px;background:rgba(0,255,136,.05);border-radius:12px;border-left:3px solid #00ff88}
+    /* MCQ */
+    .quiz-opts{display:flex;flex-direction:column;gap:12px}
+    .quiz-opt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:15px;padding:16px 22px;cursor:pointer;transition:.3s;font-size:1rem;text-align:left;color:#fff}
+    .quiz-opt:hover{border-color:#00ff88;background:rgba(0,255,136,.1)}
+    .quiz-opt.correct{border-color:#00ff88;background:rgba(0,255,136,.2);color:#00ff88}
+    .quiz-opt.wrong{border-color:#ff4444;background:rgba(255,0,0,.1);color:#ff4444}
+    .quiz-opt:disabled{cursor:not-allowed}
+    /* INPUT type */
+    .quiz-input-wrap{display:flex;gap:15px;margin-top:10px}
+    .quiz-input{flex:1;background:rgba(255,255,255,.05);border:2px solid rgba(0,255,136,.3);border-radius:15px;padding:15px 20px;color:#fff;font-size:1.3rem;outline:none;text-align:center;font-weight:700}
+    .quiz-input:focus{border-color:#00ff88}
+    .quiz-submit{padding:15px 30px;background:linear-gradient(135deg,#00ff88,#ff00ff);border:none;border-radius:15px;color:#000;font-weight:900;cursor:pointer;font-size:1rem}
+    .quiz-feedback{margin-top:20px;padding:18px 22px;border-radius:15px;font-size:1.1rem;font-weight:700;display:none}
+    .quiz-feedback.ok{background:rgba(0,255,136,.15);border:2px solid rgba(0,255,136,.4);color:#00ff88}
+    .quiz-feedback.fail{background:rgba(255,0,0,.1);border:2px solid rgba(255,0,0,.3);color:#ff6666}
+    .quiz-next{margin-top:15px;padding:14px 30px;background:rgba(0,255,136,.15);border:2px solid rgba(0,255,136,.3);border-radius:15px;color:#00ff88;font-weight:700;cursor:pointer;font-size:1rem;display:none}
+    .quiz-next:hover{background:rgba(0,255,136,.3)}
+    /* RESULT */
+    .quiz-result{text-align:center;padding:20px}
+    .quiz-result .big-emoji{font-size:5rem;margin-bottom:10px}
+    .quiz-result .score-num{font-size:4rem;font-weight:900;margin:15px 0}
+    .quiz-result .xp-box{background:rgba(0,255,136,.1);border:2px solid rgba(0,255,136,.3);border-radius:20px;padding:20px;margin:20px 0;font-size:1.2rem}
+    /* CHAT */
+    .chat-container{background:rgba(15,15,25,.9);border:2px solid rgba(0,255,136,.2);border-radius:30px;height:70vh;display:flex;flex-direction:column;overflow:hidden}
+    .chat-header{background:linear-gradient(135deg,#00ff88,#ff00ff);padding:20px 25px;display:flex;align-items:center;gap:15px}
+    .chat-ai-avatar{width:50px;height:50px;background:rgba(0,0,0,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+    .chat-header-info h3{color:#000;font-weight:900}
+    .chat-header-info p{color:rgba(0,0,0,.7);font-size:.85rem}
+    .online-dot{width:12px;height:12px;background:#fff;border-radius:50%;margin-left:auto;animation:pulse 2s infinite}
+    .chat-messages{flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:15px}
+    .chat-messages::-webkit-scrollbar{width:5px}
+    .chat-messages::-webkit-scrollbar-thumb{background:rgba(0,255,136,.3);border-radius:5px}
+    .msg{display:flex;align-items:flex-end;gap:12px;animation:fadeIn .3s ease}
+    .msg.user{flex-direction:row-reverse}
+    .msg-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .msg-avatar.ai{background:linear-gradient(135deg,#00ff88,#00cc66)}
+    .msg-avatar.user{background:linear-gradient(135deg,#ff00ff,#cc00cc)}
+    .msg-bubble{max-width:70%;padding:15px 20px;border-radius:20px;font-size:.95rem;line-height:1.6}
+    .msg.ai .msg-bubble{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);border-bottom-left-radius:5px}
+    .msg.user .msg-bubble{background:rgba(255,0,255,.15);border:1px solid rgba(255,0,255,.2);border-bottom-right-radius:5px}
+    .typing{display:flex;gap:5px;padding:5px}
+    .typing span{width:8px;height:8px;background:#00ff88;border-radius:50%;animation:pulse .8s infinite}
+    .typing span:nth-child(2){animation-delay:.2s}
+    .typing span:nth-child(3){animation-delay:.4s}
+    .chat-input-area{padding:20px 25px;border-top:2px solid rgba(0,255,136,.1);display:flex;gap:15px}
+    .chat-input{flex:1;background:rgba(255,255,255,.05);border:2px solid rgba(0,255,136,.2);border-radius:15px;padding:15px 20px;color:#fff;font-size:1rem;outline:none;transition:.3s}
+    .chat-input:focus{border-color:#00ff88}
+    .send-btn{padding:15px 25px;background:linear-gradient(135deg,#00ff88,#ff00ff);border:none;border-radius:15px;color:#000;font-weight:900;cursor:pointer;font-size:1.1rem}
+    .leaderboard{background:rgba(20,20,30,.8);border:2px solid rgba(0,255,136,.2);border-radius:25px;overflow:hidden}
+    .lb-item{display:flex;align-items:center;gap:20px;padding:20px 25px;border-bottom:1px solid rgba(0,255,136,.1);transition:.3s}
+    .lb-item:hover{background:rgba(0,255,136,.05)}
+    .lb-rank{width:50px;text-align:center;font-size:1.5rem;font-weight:900}
+    .lb-rank.r1{color:gold}.lb-rank.r2{color:silver}.lb-rank.r3{color:#cd7f32}
+    .lb-name{flex:1;font-weight:700}
+    .lb-xp{color:#00ff88;font-weight:900}
+    .profile-grid{display:grid;grid-template-columns:1fr 2fr;gap:25px}
+    .profile-card{background:rgba(20,20,30,.8);border:2px solid rgba(0,255,136,.2);border-radius:25px;padding:30px}
+    .profile-avatar-big{width:100px;height:100px;background:linear-gradient(135deg,#00ff88,#ff00ff);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:900;color:#000;margin:0 auto 20px}
+    .profile-name{text-align:center;color:#00ff88;font-size:1.5rem;font-weight:900;margin-bottom:5px}
+    .profile-email{text-align:center;color:#666;margin-bottom:20px}
+    .profile-badge{background:linear-gradient(135deg,#00ff88,#ff00ff);color:#000;padding:6px 20px;border-radius:100px;font-weight:700;font-size:.85rem;display:inline-block}
+    .stat-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+    .stat-row:last-child{border:none}
+    .logout-btn{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:15px;color:#ff4444;margin-top:10px;cursor:pointer;transition:.3s;border:none;background:transparent;width:100%;font-size:1rem}
+    .logout-btn:hover{background:rgba(255,0,0,.1)}
+    .levelup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:999;display:none}
+    .levelup-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,20,.99);border:3px solid #00ff88;border-radius:30px;padding:50px;text-align:center;z-index:1000;display:none;box-shadow:0 0 80px rgba(0,255,136,.5);min-width:350px}
+    @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}.courses-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.stats-grid,.courses-grid{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="daxshat-bg"></div>
+  <div id="particles"></div>
+  <div class="levelup-overlay" id="lvlOverlay"></div>
+  <div class="levelup-popup" id="lvlPopup">
+    <div style="font-size:4rem">🎉</div>
+    <h1 class="neon-text" style="font-size:2.5rem;margin:10px 0">LEVEL UP!</h1>
+    <p id="lvlText" style="color:#888;font-size:1.1rem;margin-bottom:10px"></p>
+    <div id="lvlXP" style="color:#00ff88;font-size:1.4rem;font-weight:900;margin:10px 0"></div>
+    <button class="daxshat-btn" style="margin-top:15px" onclick="closeLvl()">🚀 DAVOM ETISH</button>
+  </div>
+
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-logo"><h1 class="neon-text">🎓 EduBot</h1><p>DAXSHAT AI O'qituvchi Platformasi</p></div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">KIRISH</button>
+        <button class="auth-tab" onclick="switchTab('register')">RO'YXAT</button>
+      </div>
+      <div class="error-msg" id="authError"></div>
+      <div id="loginForm">
+        <div class="input-group"><label>EMAIL</label><input type="email" id="loginEmail" placeholder="email@example.com" value="student@edubot.uz"></div>
+        <div class="input-group"><label>PAROL</label><input type="password" id="loginPassword" placeholder="••••••••" value="Student123!"></div>
+        <button class="daxshat-btn" onclick="login()">🚀 KIRISH</button>
+        <div class="demo-info">Demo: student@edubot.uz / Student123!</div>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="input-group"><label>ISM</label><input type="text" id="regName" placeholder="Ismingiz"></div>
+        <div class="input-group"><label>EMAIL</label><input type="email" id="regEmail" placeholder="email@example.com"></div>
+        <div class="input-group"><label>PAROL</label><input type="password" id="regPassword" placeholder="Kamida 6 belgi"></div>
+        <button class="daxshat-btn" onclick="register()">✨ RO'YXATDAN O'TISH</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="mainApp">
+    <div class="sidebar">
+      <div style="position:relative;margin:-25px -25px 20px -25px;height:100px;overflow:hidden;border-radius:0 0 20px 20px">
+  <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=400&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.7">
+  <div style="position:absolute;inset:0;background:linear-gradient(transparent,rgba(0,0,0,.6));display:flex;align-items:flex-end;padding:12px 15px">
+    <div><div style="color:#00ff88;font-size:1.2rem;font-weight:900">🎓 EduBot</div><div style="color:#aaa;font-size:.7rem">DAXSHAT PLATFORM</div></div>
+  </div>
+</div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="showPage('dashboard',this)"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=80&q=80" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0"> Bosh sahifa</button>
+        <button class="nav-item" onclick="showPage('courses',this)"><img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=80&q=80" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0"> Kurslar</button>
+        <button class="nav-item" onclick="showPage('chat',this)"><span class="nav-icon">🤖</span> AI Chat</button>
+        <button class="nav-item" onclick="showPage('leaderboard',this)"><span class="nav-icon">🏆</span> Reyting</button>
+        <button class="nav-item" onclick="showPage('profile',this)"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0"> Profil</button>
+        <button class="nav-item" onclick="showPage('admin',this)" style="color:#ff9900"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=80&q=80" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0"> Server</button>
+        <button class="logout-btn" onclick="logout()"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&q=80" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0"> Chiqish</button>
+      </nav>
+      <div class="sidebar-user" style="flex-direction:column;padding:0;overflow:hidden;border-radius:20px;border:2px solid rgba(0,255,136,.3)">
+        <div style="position:relative;width:100%;height:80px">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.5">
+          <div style="position:absolute;inset:0;background:linear-gradient(transparent,rgba(0,0,0,.8))"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 15px;margin-top:-30px;position:relative">
+          <div id="sidebarAvatar" style="width:50px;height:50px;border-radius:50%;overflow:hidden;border:3px solid #00ff88;box-shadow:0 0 15px rgba(0,255,136,.5);flex-shrink:0;background:linear-gradient(135deg,#00ff88,#ff00ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1.2rem">A</div>
+          <div>
+            <div style="color:#fff;font-weight:700;font-size:.9rem" id="sidebarName">...</div>
+            <div style="color:#00ff88;font-size:.75rem;font-weight:700" id="sidebarXP">0 XP | Level 1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="page active" id="dashboard">
+        <div style="position:relative;border-radius:25px;overflow:hidden;margin-bottom:30px;height:120px">
+  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.5">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.8),transparent);display:flex;align-items:center;padding:30px">
+    <h1 class="neon-text" style="font-size:2.5rem;font-weight:900">BOSH SAHIFA</h1>
+  </div>
+</div>
+        <div class="stats-grid">
+          <div class="stat-card" style="padding:0;overflow:hidden;border:2px solid rgba(0,255,136,.4);position:relative">
+  <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80" style="width:100%;height:90px;object-fit:cover;opacity:0.6;display:block">
+  <div style="position:absolute;top:8px;left:12px;background:rgba(0,255,136,.2);border:1px solid #00ff88;border-radius:8px;padding:3px 10px;font-size:.7rem;font-weight:900;color:#00ff88">⚡ XP BALL</div>
+  <div style="padding:15px 20px;background:linear-gradient(135deg,rgba(0,255,136,.12),rgba(0,20,15,.95))">
+    <div id="statXP" style="font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#00ff88,#00ccff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">0</div>
+    <div style="color:#00ff88;font-size:.8rem;opacity:.8;margin-top:4px">Umumiy ball</div>
+  </div>
+</div>
+          <div class="stat-card" style="padding:0;overflow:hidden;border:2px solid rgba(255,0,255,.4);position:relative">
+  <img src="https://images.unsplash.com/photo-1614850715649-1d0106293bd1?w=400&q=80" style="width:100%;height:90px;object-fit:cover;opacity:0.6;display:block">
+  <div style="position:absolute;top:8px;left:12px;background:rgba(255,0,255,.2);border:1px solid #ff00ff;border-radius:8px;padding:3px 10px;font-size:.7rem;font-weight:900;color:#ff00ff">🏅 LEVEL</div>
+  <div style="padding:15px 20px;background:linear-gradient(135deg,rgba(255,0,255,.12),rgba(20,0,20,.95))">
+    <div id="statLevel" style="font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#ff00ff,#ff6688);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">1</div>
+    <div style="color:#ff00ff;font-size:.8rem;opacity:.8;margin-top:4px">Hozirgi daraja</div>
+  </div>
+</div>
+          <div class="stat-card" style="padding:0;overflow:hidden;border:2px solid rgba(0,200,255,.4);position:relative">
+  <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80" style="width:100%;height:90px;object-fit:cover;opacity:0.65;display:block">
+  <div style="position:absolute;top:8px;left:12px;background:rgba(0,200,255,.2);border:1px solid #00ccff;border-radius:8px;padding:3px 10px;font-size:.7rem;font-weight:900;color:#00ccff">📚 KURSLAR</div>
+  <div style="padding:15px 20px;background:linear-gradient(135deg,rgba(0,200,255,.12),rgba(0,10,25,.95))">
+    <div id="statCourses" style="font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#00ccff,#0088ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">0/6</div>
+    <div style="color:#00ccff;font-size:.8rem;opacity:.8;margin-top:4px">Tugatilgan</div>
+  </div>
+</div>
+          <div class="stat-card" style="padding:0;overflow:hidden;border:2px solid rgba(255,200,0,.4);position:relative">
+  <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&q=80" style="width:100%;height:90px;object-fit:cover;opacity:0.6;display:block">
+  <div style="position:absolute;top:8px;left:12px;background:rgba(255,200,0,.2);border:1px solid #ffc800;border-radius:8px;padding:3px 10px;font-size:.7rem;font-weight:900;color:#ffc800">✅ TESTLAR</div>
+  <div style="padding:15px 20px;background:linear-gradient(135deg,rgba(255,200,0,.12),rgba(20,15,0,.95))">
+    <div id="statTests" style="font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#ffc800,#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1">0</div>
+    <div style="color:#ffc800;font-size:.8rem;opacity:.8;margin-top:4px">O'tilgan testlar</div>
+  </div>
+</div>
+        </div>
+        <h2 style="color:#00ff88;margin-bottom:25px;font-size:1.8rem">🔥 KURSLARIM</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:35px">
+  <div style="border-radius:20px;overflow:hidden;border:2px solid rgba(0,255,136,.25);box-shadow:0 0 25px rgba(0,255,136,.15);position:relative;height:180px">
+    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.7">
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent,rgba(0,0,0,.85))">
+      <div style="color:#00ff88;font-weight:900;font-size:1.1rem">📐 Matematika & Fizika</div>
+      <div style="color:#aaa;font-size:.8rem">Formula va hisob-kitoblar dunyosi</div>
+    </div>
+  </div>
+  <div style="border-radius:20px;overflow:hidden;border:2px solid rgba(255,0,255,.25);box-shadow:0 0 25px rgba(255,0,255,.15);position:relative;height:180px">
+    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.7">
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent,rgba(0,0,0,.85))">
+      <div style="color:#ff00ff;font-weight:900;font-size:1.1rem">🇬🇧 Ingliz tili</div>
+      <div style="color:#aaa;font-size:.8rem">Grammar, Tenses, Vocabulary</div>
+    </div>
+  </div>
+  <div style="border-radius:20px;overflow:hidden;border:2px solid rgba(0,200,255,.25);box-shadow:0 0 25px rgba(0,200,255,.15);position:relative;height:180px">
+    <img src="https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=600&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.7">
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent,rgba(0,0,0,.85))">
+      <div style="color:#00ccff;font-weight:900;font-size:1.1rem">🧪 Kimyo & Tarix</div>
+      <div style="color:#aaa;font-size:.8rem">Organik kimyo va O'zbekiston tarixi</div>
+    </div>
+  </div>
+  <div style="border-radius:20px;overflow:hidden;border:2px solid rgba(255,200,0,.25);box-shadow:0 0 25px rgba(255,200,0,.15);position:relative;height:180px">
+    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.7">
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent,rgba(0,0,0,.85))">
+      <div style="color:#ffc800;font-weight:900;font-size:1.1rem">💻 Dasturlash</div>
+      <div style="color:#aaa;font-size:.8rem">Python Pro — kod yozishni o'rgan</div>
+    </div>
+  </div>
+</div>
+<div class="courses-grid" id="dashCourses"></div>
+      </div>
+
+      <div class="page" id="courses">
+        <div id="coursesList">
+          <div style="position:relative;border-radius:25px;overflow:hidden;margin-bottom:30px;height:120px">
+  <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.5">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.8),transparent);display:flex;align-items:center;padding:30px">
+    <h1 class="neon-text" style="font-size:2.5rem;font-weight:900">BARCHA KURSLAR</h1>
+  </div>
+</div>
+          <div class="courses-grid" id="allCourses"></div>
+        </div>
+        <div id="courseDetail" style="display:none" class="course-detail"></div>
+        <div id="quizWrap" style="display:none"></div>
+      </div>
+
+      <div class="page" id="chat">
+        <h1 class="page-title neon-text">🤖 DAXSHAT AI O'QITUVCHI</h1>
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-ai-avatar">🤖</div>
+            <div class="chat-header-info"><h3>EduBot AI</h3><p>24/7 online | Groq AI</p></div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg ai"><div class="msg-avatar ai">🤖</div><div class="msg-bubble"><strong>Assalomu alaykum!</strong> Men sizning shaxsiy AI o'qituvchingizman 🎓<br>Matematika, fizika, ingliz tili yoki boshqa fanlardan savol bering!</div></div>
+          </div>
+          <div class="chat-input-area">
+            <input class="chat-input" id="chatInput" placeholder="Savolingizni yozing..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="send-btn" onclick="sendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="admin">
+        <div style="position:relative;border-radius:25px;overflow:hidden;margin-bottom:30px;height:120px">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80" style="width:100%;height:100%;object-fit:cover;opacity:0.5">
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.8),transparent);display:flex;align-items:center;padding:30px">
+            <h1 class="neon-text" style="font-size:2.5rem;font-weight:900">SERVER PANEL</h1>
+          </div>
+        </div>
+        <div id="adminContent">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:30px">
+            <div style="background:rgba(20,20,30,.9);border:2px solid rgba(0,255,136,.3);border-radius:20px;padding:25px;text-align:center">
+              <div style="font-size:2.5rem;margin-bottom:8px">👥</div>
+              <div id="adminUsers" style="font-size:2rem;font-weight:900;color:#00ff88">-</div>
+              <div style="color:#888;font-size:.85rem">Jami foydalanuvchilar</div>
+            </div>
+            <div style="background:rgba(20,20,30,.9);border:2px solid rgba(255,0,255,.3);border-radius:20px;padding:25px;text-align:center">
+              <div style="font-size:2.5rem;margin-bottom:8px">⚡</div>
+              <div id="adminTotalXP" style="font-size:2rem;font-weight:900;color:#ff00ff">-</div>
+              <div style="color:#888;font-size:.85rem">Umumiy XP</div>
+            </div>
+            <div style="background:rgba(20,20,30,.9);border:2px solid rgba(255,200,0,.3);border-radius:20px;padding:25px;text-align:center">
+              <div style="font-size:2.5rem;margin-bottom:8px">🏆</div>
+              <div id="adminTopUser" style="font-size:1.2rem;font-weight:900;color:#ffc800">-</div>
+              <div style="color:#888;font-size:.85rem">Top foydalanuvchi</div>
+            </div>
+          </div>
+          <div style="background:rgba(20,20,30,.9);border:2px solid rgba(0,255,136,.2);border-radius:25px;overflow:hidden">
+            <div style="padding:20px 25px;border-bottom:1px solid rgba(0,255,136,.1);display:flex;justify-content:space-between;align-items:center">
+              <h3 style="color:#00ff88;font-size:1.2rem">👥 BARCHA FOYDALANUVCHILAR</h3>
+              <span style="color:#666;font-size:.85rem">Kim kirdi • Natijalar • Ballar</span>
+            </div>
+            <div id="adminUserList" style="padding:10px">
+              <div style="padding:30px;text-align:center;color:#666">Yuklanmoqda...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="leaderboard">
+        <h1 class="page-title neon-text">🏆 REYTING</h1>
+        <div class="leaderboard" id="lbList"><div style="padding:30px;text-align:center;color:#666">Yuklanmoqda...</div></div>
+      </div>
+
+      <div class="page" id="profile">
+
+        <!-- COVER + AVATAR -->
+        <div style="position:relative;border-radius:28px;overflow:hidden;height:230px;margin-bottom:20px;box-shadow:0 8px 40px rgba(0,0,0,.6)">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80" style="width:100%;height:100%;object-fit:cover">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,20,.2) 0%,rgba(5,5,20,.85) 100%)"></div>
+          <!-- Role badge top right -->
+          <div style="position:absolute;top:18px;right:20px">
+            <span id="profRole" style="background:linear-gradient(135deg,#00ff88,#00ccff);color:#000;padding:7px 20px;border-radius:100px;font-weight:900;font-size:.8rem;letter-spacing:1px;box-shadow:0 4px 15px rgba(0,255,136,.4)">STUDENT</span>
+          </div>
+          <!-- Avatar - markazda, tepada -->
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+            <div id="profAvatar" style="width:90px;height:90px;border-radius:50%;border:4px solid #00ff88;box-shadow:0 0 35px rgba(0,255,136,.5),0 8px 25px rgba(0,0,0,.6);background:linear-gradient(135deg,#00ff88,#ff00ff);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:900;color:#000">A</div>
+            <div style="text-align:center">
+              <div id="profName" style="font-size:1.7rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.9);line-height:1.1">-</div>
+              <div id="profEmail" style="color:#ccc;font-size:.8rem;margin-top:3px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS 4 ta - DAXSHAT DIZAYN -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+
+          <!-- XP BALL -->
+          <div style="position:relative;border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;box-shadow:0 8px 30px rgba(0,255,136,.2)" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(0,255,136,.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 8px 30px rgba(0,255,136,.2)'">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,255,136,.7) 0%,rgba(0,80,50,.95) 100%)"></div>
+            <div style="position:relative;padding:22px 16px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,255,136,.25);border:2px solid rgba(0,255,136,.6);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.5rem;box-shadow:0 0 20px rgba(0,255,136,.4)">⚡</div>
+              <div id="profXP" style="font-size:2rem;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(0,255,136,.8)">0</div>
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-top:6px;letter-spacing:2px;font-weight:700">XP BALL</div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00ff88,#00ffcc)"></div>
+            </div>
+          </div>
+
+          <!-- LEVEL -->
+          <div style="position:relative;border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;box-shadow:0 8px 30px rgba(255,0,255,.2)" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(255,0,255,.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 8px 30px rgba(255,0,255,.2)'">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,0,255,.7) 0%,rgba(80,0,80,.95) 100%)"></div>
+            <div style="position:relative;padding:22px 16px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,0,255,.25);border:2px solid rgba(255,0,255,.6);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.5rem;box-shadow:0 0 20px rgba(255,0,255,.4)">🏅</div>
+              <div id="profLevel" style="font-size:2rem;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(255,0,255,.8)">1</div>
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-top:6px;letter-spacing:2px;font-weight:700">LEVEL</div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff00ff,#ff88cc)"></div>
+            </div>
+          </div>
+
+          <!-- KURSLAR -->
+          <div style="position:relative;border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;box-shadow:0 8px 30px rgba(0,200,255,.2)" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(0,200,255,.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 8px 30px rgba(0,200,255,.2)'">
+            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,180,255,.7) 0%,rgba(0,40,80,.95) 100%)"></div>
+            <div style="position:relative;padding:22px 16px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,200,255,.25);border:2px solid rgba(0,200,255,.6);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.5rem;box-shadow:0 0 20px rgba(0,200,255,.4)">📚</div>
+              <div id="profCourses" style="font-size:2rem;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(0,200,255,.8)">0</div>
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-top:6px;letter-spacing:2px;font-weight:700">KURSLAR</div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00ccff,#0088ff)"></div>
+            </div>
+          </div>
+
+          <!-- TESTLAR -->
+          <div style="position:relative;border-radius:22px;overflow:hidden;cursor:pointer;transition:.3s;box-shadow:0 8px 30px rgba(255,200,0,.2)" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 16px 40px rgba(255,200,0,.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 8px 30px rgba(255,200,0,.2)'">
+            <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,180,0,.7) 0%,rgba(80,50,0,.95) 100%)"></div>
+            <div style="position:relative;padding:22px 16px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,200,0,.25);border:2px solid rgba(255,200,0,.6);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.5rem;box-shadow:0 0 20px rgba(255,200,0,.4)">✅</div>
+              <div id="profTests" style="font-size:2rem;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 20px rgba(255,200,0,.8)">0</div>
+              <div style="color:rgba(255,255,255,.7);font-size:.68rem;margin-top:6px;letter-spacing:2px;font-weight:700">TESTLAR</div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffc800,#ff8800)"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 3 USTUN: Progress | Faoliyat | Yutuqlar -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px">
+
+          <!-- Level Progress -->
+          <div style="background:rgba(15,15,28,.95);border:1.5px solid rgba(0,255,136,.15);border-radius:22px;padding:24px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+              <div style="width:8px;height:24px;background:linear-gradient(180deg,#00ff88,#00ccff);border-radius:4px"></div>
+              <h3 style="color:#00ff88;font-size:.9rem;font-weight:800;letter-spacing:2px">PROGRESS</h3>
+            </div>
+            <div style="text-align:center;margin-bottom:18px">
+              <div style="font-size:3.5rem;font-weight:900;background:linear-gradient(135deg,#00ff88,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1" id="profLevelBig">1</div>
+              <div style="color:#555;font-size:.8rem;margin-top:4px">Hozirgi level</div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+                <span style="color:#666;font-size:.78rem">Keyingi levelga</span>
+                <span style="color:#00ff88;font-size:.78rem;font-weight:700" id="profNextLevel">500 XP</span>
+              </div>
+              <div style="background:rgba(255,255,255,.06);border-radius:100px;height:9px;overflow:hidden">
+                <div id="profLevelBar" style="height:9px;border-radius:100px;background:linear-gradient(90deg,#00ff88,#ff00ff);width:0%;transition:.6s;box-shadow:0 0 10px rgba(0,255,136,.4)"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(255,255,255,.04)">
+              <span style="color:#666;font-size:.8rem">Streak</span>
+              <span style="color:#ffc800;font-weight:700;font-size:.85rem">🔥 Faol</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid rgba(255,255,255,.04)">
+              <span style="color:#666;font-size:.8rem">Platforma</span>
+              <span style="color:#aaa;font-weight:600;font-size:.82rem">EduBot 2024</span>
+            </div>
+          </div>
+
+          <!-- So'nggi faoliyat -->
+          <div style="background:rgba(15,15,28,.95);border:1.5px solid rgba(0,200,255,.15);border-radius:22px;padding:24px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+              <div style="width:8px;height:24px;background:linear-gradient(180deg,#00ccff,#0088ff);border-radius:4px"></div>
+              <h3 style="color:#00ccff;font-size:.9rem;font-weight:800;letter-spacing:2px">FAOLIYAT</h3>
+            </div>
+            <div id="profActivity">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,255,136,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">📖</div>
+                <div><div style="font-size:.83rem;font-weight:600">Kurs boshlandi</div><div style="font-size:.72rem;color:#555">Matematika • Algebra</div></div>
+                <div style="margin-left:auto;color:#00ff88;font-size:.75rem;font-weight:700">+40 XP</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,0,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🏆</div>
+                <div><div style="font-size:.83rem;font-weight:600">Test yakunlandi</div><div style="font-size:.72rem;color:#555">Ingliz tili • Tenses</div></div>
+                <div style="margin-left:auto;color:#ff00ff;font-size:.75rem;font-weight:700">+55 XP</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,200,0,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">⚡</div>
+                <div><div style="font-size:.83rem;font-weight:600">Level ko'tarildi</div><div style="font-size:.72rem;color:#555">1 → 2 Level</div></div>
+                <div style="margin-left:auto;color:#ffc800;font-size:.75rem;font-weight:700">🎉</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,200,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🤖</div>
+                <div><div style="font-size:.83rem;font-weight:600">AI bilan suhbat</div><div style="font-size:.72rem;color:#555">12 ta savol berildi</div></div>
+                <div style="margin-left:auto;color:#00ccff;font-size:.75rem;font-weight:700">Faol</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Yutuqlar -->
+          <div style="background:rgba(15,15,28,.95);border:1.5px solid rgba(255,0,255,.15);border-radius:22px;padding:24px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+              <div style="width:8px;height:24px;background:linear-gradient(180deg,#ff00ff,#ff6688);border-radius:4px"></div>
+              <h3 style="color:#ff00ff;font-size:.9rem;font-weight:800;letter-spacing:2px">YUTUQLAR</h3>
+            </div>
+            <div id="profAchievements">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#ffc800,#ff8800);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🌟</div>
+                <div style="flex:1"><div style="font-size:.83rem;font-weight:700">Yangi boshlovchi</div><div style="font-size:.72rem;color:#666">Platformaga qoshildi</div></div>
+                <div style="width:22px;height:22px;border-radius:50%;background:rgba(0,255,136,.15);border:1.5px solid #00ff88;display:flex;align-items:center;justify-content:center;color:#00ff88;font-size:.75rem">✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)" id="ach1">
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(0,200,255,.1);border:1.5px solid rgba(0,200,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">📚</div>
+                <div style="flex:1"><div style="font-size:.83rem;font-weight:700">Birinchi kurs</div><div style="font-size:.72rem;color:#666">Bitta kursni tugat</div></div>
+                <span id="ach1s" style="color:#555;font-size:.85rem">—</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(0,255,136,.1);border:1.5px solid rgba(0,255,136,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">⚡</div>
+                <div style="flex:1"><div style="font-size:.83rem;font-weight:700">500 XP Club</div><div style="font-size:.72rem;color:#666">500 XP toplash</div></div>
+                <span id="ach2s" style="color:#555;font-size:.85rem">—</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+                <div style="width:38px;height:38px;border-radius:12px;background:rgba(255,0,255,.1);border:1.5px solid rgba(255,0,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🔥</div>
+                <div style="flex:1"><div style="font-size:.83rem;font-weight:700">Top O'quvchi</div><div style="font-size:.72rem;color:#666">Reytingda 1-o'rin</div></div>
+                <span style="color:#555;font-size:.85rem">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qurilma va Xavfsizlik -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div style="background:rgba(15,15,28,.95);border:1.5px solid rgba(255,200,0,.12);border-radius:22px;padding:22px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+              <div style="width:8px;height:24px;background:linear-gradient(180deg,#ffc800,#ff8800);border-radius:4px"></div>
+              <h3 style="color:#ffc800;font-size:.9rem;font-weight:800;letter-spacing:2px">QURILMA</h3>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:1.4rem">🖥️</span>
+              <div><div style="font-size:.83rem;font-weight:600">Brauzer</div><div style="font-size:.75rem;color:#555">Chrome / Edge</div></div>
+              <span style="margin-left:auto;color:#00ff88;font-size:.75rem">Faol</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:1.4rem">🌐</span>
+              <div><div style="font-size:.83rem;font-weight:600">Platform</div><div style="font-size:.75rem;color:#555">Web App</div></div>
+              <span style="margin-left:auto;color:#00ccff;font-size:.75rem">Online</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <span style="font-size:1.4rem">🔒</span>
+              <div><div style="font-size:.83rem;font-weight:600">Xavfsizlik</div><div style="font-size:.75rem;color:#555">JWT Token</div></div>
+              <span style="margin-left:auto;color:#00ff88;font-size:.75rem">✓ Himoyalangan</span>
+            </div>
+          </div>
+          <div style="background:rgba(15,15,28,.95);border:1.5px solid rgba(0,255,136,.12);border-radius:22px;padding:22px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+              <div style="width:8px;height:24px;background:linear-gradient(180deg,#00ff88,#00ccff);border-radius:4px"></div>
+              <h3 style="color:#00ff88;font-size:.9rem;font-weight:800;letter-spacing:2px">HISOB</h3>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:1.4rem">📅</span>
+              <div><div style="font-size:.83rem;font-weight:600">Qoshilgan sana</div><div style="font-size:.75rem;color:#555">EduBot 2024</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:1.4rem">🤖</span>
+              <div><div style="font-size:.83rem;font-weight:600">AI Suhbatlar</div><div style="font-size:.75rem;color:#555">Groq AI bilan</div></div>
+              <span style="margin-left:auto;color:#ff00ff;font-size:.75rem">Faol</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <span style="font-size:1.4rem">🏆</span>
+              <div><div style="font-size:.83rem;font-weight:600">Reyting o'rni</div><div style="font-size:.75rem;color:#555" id="profRank">Hisoblanmoqda...</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+const API='http://localhost:5000/api';
+let currentUser=null, token=localStorage.getItem('edubot_token'), chatHistory=[];
+
+// ===== KURSLAR MA'LUMOTLARI =====
+const COURSES=[
+// ===== 1. MATEMATIKA =====
+{id:1,cat:'⚡ MATEMATIKA',title:'Algebra Master',teacher:'Prof. Axmedov',img:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500',xpReward:500,
+ lessons:[
+  {id:1,title:'Tenglamalar asoslari',desc:'Chiziqli tenglamalar • 10 savol',xp:40,lessonQuiz:[
+   {type:'mcq',q:'x + 5 = 12 — x = ?',opts:["8","6","7","9"],ans:2},
+   {type:'mcq',q:'2x = 14 — x = ?',opts:["8","6","9","7"],ans:3},
+   {type:'mcq',q:'x - 3 = 9 — x = ?',opts:["13","11","12","14"],ans:2},
+   {type:'mcq',q:'3x + 6 = 15 — x = ?',opts:["4","2","5","3"],ans:3},
+   {type:'mcq',q:'5x - 10 = 20 — x = ?',opts:["7","5","6","8"],ans:2},
+   {type:'mcq',q:'2x + 4 = 10 da x = ?',opts:["2","3","4","5"],ans:1},
+   {type:'mcq',q:'Chiziqli tenglama ko\'rinishi:',opts:["ax²+bx+c=0","ax+b=0","x³=0","ax²=0"],ans:1},
+   {type:'mcq',q:'4x = 28 — x = ?',opts:["8","6","7","9"],ans:2},
+   {type:'mcq',q:'x/3 = 5 — x = ?',opts:["16","15","14","17"],ans:1},
+   {type:'mcq',q:'6x - 12 = 0 da x = ?',opts:["1","2","3","4"],ans:1}
+  ]},
+  {id:2,title:'Kvadrat tenglamalar',desc:'ax²+bx+c=0 • 15 savol',xp:55,lessonQuiz:[
+   {type:'mcq',q:'x² = 9 — x musbat = ?',opts:["4","3","2","5"],ans:1},
+   {type:'mcq',q:'x² = 16 — x musbat = ?',opts:["5","3","4","6"],ans:2},
+   {type:'mcq',q:'x² - 4 = 0 — x musbat = ?',opts:["2","3","1","4"],ans:0},
+   {type:'mcq',q:'x² - 5x + 6 = 0 yechimlari:',opts:["x=1,x=6","x=2,x=3","x=1,x=5","x=3,x=4"],ans:1},
+   {type:'mcq',q:'Kvadrat tenglama formulasi:',opts:["ax+b=0","ax²+bx+c=0","x³+a=0","ax+b=c"],ans:1},
+   {type:'mcq',q:'x² = 25 — x musbat = ?',opts:["6","4","7","5"],ans:3},
+   {type:'mcq',q:'x² - 9 = 0 yechimlari:',opts:["x=3","x=±3","x=9","x=±9"],ans:1},
+   {type:'mcq',q:'2x² = 8 — x musbat = ?',opts:["3","1","4","2"],ans:3},
+   {type:'mcq',q:'Diskriminant formulasi:',opts:["D=b²+4ac","D=b²-4ac","D=2b-ac","D=b-4ac"],ans:1},
+   {type:'mcq',q:'D < 0 bo\'lsa:',opts:["2 ta yechim","1 ta yechim","Yechimsiz","Ko'p yechim"],ans:2},
+   {type:'mcq',q:'x² - 1 = 0 — x musbat = ?',opts:["1","2","0","3"],ans:0},
+   {type:'mcq',q:'x² + 6x + 9 = 0 da x = ?',opts:["x=-3","x=3","x=-9","x=9"],ans:0},
+   {type:'mcq',q:'4x² = 36 — x musbat = ?',opts:["3","4","2","5"],ans:0},
+   {type:'mcq',q:'(x-2)(x+3) = 0 da x = ?',opts:["x=2 va x=-3","x=-2 va x=3","x=2 va x=3","x=-2 va x=-3"],ans:0},
+   {type:'mcq',q:'x² = 0 yechimi:',opts:["x=1","x=0","x=-1","Yechimsiz"],ans:1}
+  ]},
+  {id:3,title:'Tengsizliklar',desc:'Tengsizliklar sistemasi • 20 savol',xp:65,lessonQuiz:[
+   {type:'mcq',q:'x + 3 > 7 — x = ?',opts:["x>4","x<4","x>3","x<3"],ans:0},
+   {type:'mcq',q:'2x > 10 — x > ?',opts:["6","4","5","7"],ans:2},
+   {type:'mcq',q:'x - 5 < 3 — x = ?',opts:["x<8","x>8","x<-2","x>-2"],ans:0},
+   {type:'mcq',q:'"<" belgisi nimani anglatadi?',opts:["katta","kichik","teng","katta yoki teng"],ans:1},
+   {type:'mcq',q:'3x < 12 — x < ?',opts:["5","3","4","6"],ans:2},
+   {type:'mcq',q:'-2x > 6 yechimi:',opts:["x>-3","x<-3","x>3","x<3"],ans:1},
+   {type:'mcq',q:'|x| < 5 oraliq:',opts:["-5<x<5","x>5","x<-5","x<5"],ans:0},
+   {type:'mcq',q:'x + 10 ≤ 15 — x ≤ ?',opts:["5","6","4","7"],ans:0},
+   {type:'mcq',q:'5x ≥ 20 — x = ?',opts:["x≥4","x≤4","x>5","x<5"],ans:0},
+   {type:'mcq',q:'Tengsizlikni -1 ga ko\'paytirsak:',opts:["Belgi saqlanadi","Belgi teskari o'zgaradi","Tenglama bo'ladi","Hech narsa"],ans:1},
+   {type:'mcq',q:'4x - 8 > 0 — x > ?',opts:["3","1","2","4"],ans:2},
+   {type:'mcq',q:'x > 3 VA x < 7:',opts:["3<x<7","x<3","x>7","3>x>7"],ans:0},
+   {type:'mcq',q:'|x - 2| ≤ 3 yechim:',opts:["-1≤x≤5","x≤5","x≥-1","x≤-1"],ans:0},
+   {type:'mcq',q:'6x ≤ 30 — x ≤ ?',opts:["6","4","7","5"],ans:3},
+   {type:'mcq',q:'Tengsizlik sistemasi:',opts:["Bitta tengsizlik","Bir nechta tengsizlik birga","Tenglama","Funksiya"],ans:1},
+   {type:'mcq',q:'x/4 > 2 — x > ?',opts:["8","9","7","10"],ans:0},
+   {type:'mcq',q:'2x + 1 < 9 — x = ?',opts:["x<4","x>4","x<5","x>5"],ans:0},
+   {type:'mcq',q:'x² > 0 qachon to\'g\'ri?',opts:["x=0 da","x≠0 da","Har doim","Hech qachon"],ans:1},
+   {type:'mcq',q:'10 - 2x > 0 — x < ?',opts:["5","6","4","7"],ans:0},
+   {type:'mcq',q:'x ≥ -2 to\'plami:',opts:["Faqat musbat","Faqat manfiy","-2 dan katta yoki teng","Faqat 0"],ans:2}
+  ]},
+  {id:4,title:"Ko'paytirish formulalari",desc:"Algebraik o'zgartirishlar • 25 savol",xp:80,lessonQuiz:[
+   {type:'mcq',q:'(a+b)² = ?',opts:["a²+b²","a²+2ab+b²","a²-2ab+b²","2a²+b²"],ans:1},
+   {type:'mcq',q:'(a-b)² = ?',opts:["a²+b²","a²+2ab+b²","a²-2ab+b²","a²-b²"],ans:2},
+   {type:'mcq',q:'(a+b)(a-b) = ?',opts:["a²+b²","a²-b²","2ab","a²+2ab"],ans:1},
+   {type:'mcq',q:'(x+3)² = x² + 6x + ?',opts:["9","10","8","11"],ans:0},
+   {type:'mcq',q:'(x-5)² = x² - 10x + ?',opts:["26","25","24","27"],ans:1},
+   {type:'mcq',q:'a³ + b³ = ?',opts:["(a+b)³","(a+b)(a²-ab+b²)","(a-b)(a²+ab+b²)","(a+b)²"],ans:1},
+   {type:'mcq',q:'a³ - b³ = ?',opts:["(a+b)(a²+ab+b²)","(a-b)(a²+ab+b²)","(a-b)³","(a+b)³"],ans:1},
+   {type:'mcq',q:'(2x+1)² = 4x² + 4x + ?',opts:["1","2","0","3"],ans:0},
+   {type:'mcq',q:'(x+2)(x-2) = ?',opts:["x²+4","x²-4","x²+2x-4","x²-2x+4"],ans:1},
+   {type:'mcq',q:'(a+b)³ = ?',opts:["a³+b³","a³+3a²b+3ab²+b³","a³-3a²b+3ab²-b³","a³+2ab"],ans:1},
+   {type:'mcq',q:'(x+4)(x-4) = x² - ?',opts:["16","17","15","18"],ans:0},
+   {type:'mcq',q:'2(x+3) = ?',opts:["2x+3","2x+6","x+6","2x+5"],ans:1},
+   {type:'mcq',q:'3(2x-4) = 6x - ?',opts:["12","13","11","14"],ans:0},
+   {type:'mcq',q:'x(x+5) = ?',opts:["x²+5","x²+5x","x+5x","2x+5"],ans:1},
+   {type:'mcq',q:'(x+1)² da o\'rta had:',opts:["1","2x","x²","x"],ans:1},
+   {type:'mcq',q:'(a+b)² - (a-b)² = 4ab. a=2,b=3 da = ?',opts:["24","25","23","26"],ans:0},
+   {type:'mcq',q:'x² - 6x + 9 = ?',opts:["(x-3)²","(x+3)²","(x-9)²","(x+9)²"],ans:0},
+   {type:'mcq',q:'x² + 10x + 25 = ?',opts:["(x-5)²","(x+5)²","(x+10)²","(x-10)²"],ans:1},
+   {type:'mcq',q:'(3x)² = ?x²',opts:["10","8","9","11"],ans:2},
+   {type:'mcq',q:'ab + ac = ?',opts:["a(b+c)","a+bc","ab+c","a(b-c)"],ans:0},
+   {type:'mcq',q:'x² - 25 = (x+5)(x-?)',opts:["5","6","4","7"],ans:0},
+   {type:'mcq',q:'4x² - 9 = ?',opts:["(2x-3)²","(2x+3)(2x-3)","4x-9","(2x+3)²"],ans:1},
+   {type:'mcq',q:'(x+y+z)² nechta had?',opts:["3","4","6","9"],ans:2},
+   {type:'mcq',q:'(x-1)(x+1) = x² - ?',opts:["2","1","0","3"],ans:1},
+   {type:'mcq',q:'a²+2ab+b² = ?',opts:["(a-b)²","(a+b)²","a²-b²","(a+b)(a-b)"],ans:1}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:150,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:'5x - 15 = 0 — x = ?',opts:["4","2","3","5"],ans:2},
+  {type:'mcq',q:'x² = 36 — x musbat = ?',opts:["7","5","8","6"],ans:3},
+  {type:'mcq',q:'(a+b)² = ?',opts:["a²+b²","a²+2ab+b²","a²-2ab+b²","2ab"],ans:1},
+  {type:'mcq',q:'3x + 9 = 0 — x = ?',opts:["-2","-3","-4","-1"],ans:1},
+  {type:'mcq',q:'x² - 4x + 4 = ?',opts:["(x-2)²","(x+2)²","(x-4)²","x²-4"],ans:0},
+  {type:'mcq',q:'2x - 8 > 0 — x > ?',opts:["4","5","3","6"],ans:0},
+  {type:'mcq',q:'D=0 bo\'lsa tenglama:',opts:["2 yechim","1 yechim","Yechimsiz","Ko'p yechim"],ans:1},
+  {type:'mcq',q:'(x+6)(x-6) = x² - ?',opts:["37","35","36","38"],ans:2},
+  {type:'mcq',q:'|x| ≤ 4 yechim:',opts:["-4≤x≤4","x≤4","x≥-4","x>4"],ans:0},
+  {type:'mcq',q:'4x/2 = 10 — x = ?',opts:["5","6","4","7"],ans:0},
+  {type:'mcq',q:'a³-b³ = (a-b)(a²+?+b²)',opts:["ab","2ab","-ab","a+b"],ans:0},
+  {type:'mcq',q:'x² - 7x = 0 — x (noldan farqli) = ?',opts:["8","7","6","9"],ans:1},
+  {type:'mcq',q:'(2x+3)² = ?',opts:["4x²+9","4x²+12x+9","4x²-12x+9","2x²+6x+9"],ans:1},
+  {type:'mcq',q:'6x ≤ 18 — x ≤ ?',opts:["4","2","5","3"],ans:3},
+  {type:'mcq',q:'x² + 4x + 4 = ?',opts:["(x+2)²","(x-2)²","(x+4)²","(x-4)²"],ans:0},
+  {type:'mcq',q:'7x = 49 — x = ?',opts:["8","7","6","9"],ans:1},
+  {type:'mcq',q:'-3x > 9 — x = ?',opts:["x>-3","x<-3","x>3","x<3"],ans:1},
+  {type:'mcq',q:'(x-4)² = x² - 8x + ?',opts:["17","15","16","18"],ans:2},
+  {type:'mcq',q:'x²-9 = (x+3)(x-?)',opts:["3","9","-3","6"],ans:0},
+  {type:'mcq',q:'2x + 3 = 11 — x = ?',opts:["5","4","3","6"],ans:1},
+  {type:'mcq',q:'Chiziqli tenglama nechta yechim?',opts:["0","1","2","Cheksiz"],ans:1},
+  {type:'mcq',q:'x/5 = 4 — x = ?',opts:["21","19","22","20"],ans:3},
+  {type:'mcq',q:'(a-b)³ = ?',opts:["a³-b³","a³-3a²b+3ab²-b³","a³+3a²b+3ab²+b³","a³-3ab"],ans:1},
+  {type:'mcq',q:'9x² = 81 — x musbat = ?',opts:["4","2","3","5"],ans:2},
+  {type:'mcq',q:'x > 2 VA x < 5:',opts:["2<x<5","x<2","x>5","2≤x≤5"],ans:0},
+  {type:'mcq',q:'5(x-3) = 20 — x = ?',opts:["8","7","6","9"],ans:1},
+  {type:'mcq',q:'x² - 16 = 0 yechimlari:',opts:["x=4","x=±4","x=16","x=±16"],ans:1},
+  {type:'mcq',q:'3x - 5 = x + 7 — x = ?',opts:["6","7","5","8"],ans:0},
+  {type:'mcq',q:'ab² + a²b = ?',opts:["ab(a+b)","a(b+ab)","ab(b+a)","a²b²"],ans:0},
+  {type:'mcq',q:'|2x| = 8 — x musbat = ?',opts:["5","3","4","6"],ans:2},
+  {type:'mcq',q:'(x+y)² - (x-y)² = ?',opts:["4xy","2xy","x²-y²","4x²"],ans:0}
+ ]},
+
+// ===== 2. INGLIZ TILI =====
+{id:2,cat:'🇬🇧 INGLIZ TILI',title:'Fluency Pro',teacher:'Dr. Johnson',img:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500',xpReward:450,
+ lessons:[
+  {id:1,title:'Present Tenses',desc:'Simple va Continuous • 10 savol',xp:40,lessonQuiz:[
+   {type:'mcq',q:'She ___ to school every day.',opts:["go","goes","going","gone"],ans:1},
+   {type:'mcq',q:'I ___ reading a book now.',opts:["am","is","are","be"],ans:0},
+   {type:'mcq',q:'They ___ football at the moment.',opts:["play","plays","are playing","played"],ans:2},
+   {type:'mcq',q:'She ___ (walk) every day — 3rd person:',opts:["walks","walk","walked","walking"],ans:0},
+   {type:'mcq',q:'He ___ TV every evening.',opts:["watch","watches","watching","watched"],ans:1},
+   {type:'mcq',q:'Present Continuous qachon?',opts:["Odatdagi harakat","Hozir bo'layotgan","O'tgan","Kelajak"],ans:1},
+   {type:'mcq',q:'"Men o\'qiyapman": I ___ studying.',opts:["am","is","are","be"],ans:0},
+   {type:'mcq',q:'She is ___ a letter.',opts:["write","writes","writing","written"],ans:2},
+   {type:'mcq',q:'Present Simple signal words:',opts:["now, at the moment","always, usually, every day","yesterday, ago","tomorrow"],ans:1},
+   {type:'mcq',q:'Do/Does qachon?',opts:["Present Simple savol","Past Simple","Future","Present Perfect"],ans:0}
+  ]},
+  {id:2,title:'Past Tenses',desc:'Simple va Perfect • 15 savol',xp:55,lessonQuiz:[
+   {type:'mcq',q:'They ___ football yesterday.',opts:["play","played","playing","plays"],ans:1},
+   {type:'mcq',q:'"go" Past Simple = ?',opts:["went","go","goes","going"],ans:0},
+   {type:'mcq',q:'I ___ my homework already.',opts:["did","do","have done","doing"],ans:2},
+   {type:'mcq',q:'"eat" Past Simple = ?',opts:["ate","eat","eaten","eats"],ans:0},
+   {type:'mcq',q:'Past Simple signal words:',opts:["now, today","yesterday, ago, last year","already, just","tomorrow"],ans:1},
+   {type:'mcq',q:'"see" Past Simple = ?',opts:["saw","see","seen","sees"],ans:0},
+   {type:'mcq',q:'She has ___ the book.',opts:["read","reads","reading","readed"],ans:0},
+   {type:'mcq',q:'Present Perfect signal words:',opts:["yesterday","already, just, ever, never","last week","ago"],ans:1},
+   {type:'mcq',q:'"come" Past Participle = ?',opts:["come","come!","come?","Boshqa"],ans:0},
+   {type:'mcq',q:'I ___ in London for 5 years.',opts:["lived","have lived","live","living"],ans:1},
+   {type:'mcq',q:'"write" Past Simple = ?',opts:["wrote","write","written","writes"],ans:0},
+   {type:'mcq',q:'Did you ___ the movie?',opts:["saw","see","seen","seeing"],ans:1},
+   {type:'mcq',q:'She has never ___ sushi.',opts:["eat","ate","eaten","eating"],ans:2},
+   {type:'mcq',q:'"take" Past Simple = ?',opts:["took","take","taken","takes"],ans:0},
+   {type:'mcq',q:'Past Perfect: had + ?',opts:["V1","V2","V3","Ving"],ans:2}
+  ]},
+  {id:3,title:'Future Tenses',desc:'Will va Going to • 20 savol',xp:65,lessonQuiz:[
+   {type:'mcq',q:'I ___ call you tomorrow.',opts:["will","am","going","have"],ans:0},
+   {type:'mcq',q:'"Going to" qachon?',opts:["Spontan qaror","Rejalashtirilgan","O'tgan","Hozir"],ans:1},
+   {type:'mcq',q:'"U boradi" — Will: She ___ go.',opts:["will","shall","would","going to"],ans:0},
+   {type:'mcq',q:'She ___ going to study tomorrow.',opts:["am","is","are","be"],ans:1},
+   {type:'mcq',q:'Will + qaysi forma?',opts:["V+ed","V+ing","V1","V3"],ans:2},
+   {type:'mcq',q:'Future signal words:',opts:["yesterday","now","tomorrow, next week, soon","already"],ans:2},
+   {type:'mcq',q:'"Ular o\'ynaydi" — They ___ play.',opts:["will","shall","would","going to"],ans:0},
+   {type:'mcq',q:'Look at those clouds! It ___ rain.',opts:["will","is going to","rains","rained"],ans:1},
+   {type:'mcq',q:'Will manfiy shakli:',opts:["willn't","won't","will no","wont"],ans:1},
+   {type:'mcq',q:'I think she ___ pass the exam.',opts:["is going to","will","go to","shall"],ans:1},
+   {type:'mcq',q:'Will savol: ___ you come?',opts:["will","shall","would","going to"],ans:0},
+   {type:'mcq',q:'They ___ going to visit Paris.',opts:["am","is","are","be"],ans:2},
+   {type:'mcq',q:'"Shall" qachon?',opts:["I va We bilan formal","Har doim","O'tgan","3rd person"],ans:0},
+   {type:'mcq',q:'Future Continuous: She ___ working at 5pm.',opts:["will","will be","is","was"],ans:1},
+   {type:'mcq',q:'"Men o\'rganaman" — I ___ study.',opts:["will","shall","would","going to"],ans:0},
+   {type:'mcq',q:'Future Perfect: By 2030, I ___ graduated.',opts:["will have","will be","am","have"],ans:0},
+   {type:'mcq',q:'"Probably" + will = ?',opts:["Aniq kelajak","Ehtimol kelajak","O'tgan","Hozir"],ans:1},
+   {type:'mcq',q:'Going to manfiy: She ___ not going to come.',opts:["is","are","am","be"],ans:0},
+   {type:'mcq',q:'I\'ll = I ___ (to\'liq)',opts:["will","shall","would","going to"],ans:0},
+   {type:'mcq',q:'Unless = ?',opts:["agar","agar...bo'lmasa","lekin","yoki"],ans:1}
+  ]},
+  {id:4,title:'Modal Verbs',desc:'Can, must, should • 25 savol',xp:80,lessonQuiz:[
+   {type:'mcq',q:'You ___ smoke here. (taqiq)',opts:["should","can","must not","might"],ans:2},
+   {type:'mcq',q:'"Can" nima?',opts:["Majburiyat","Qobiliyat","Shart","Taqiq"],ans:1},
+   {type:'mcq',q:'"Siz uxlashingiz kerak": You ___ sleep.',opts:["must","should","can","might"],ans:0},
+   {type:'mcq',q:'She ___ speak 3 languages.',opts:["must","can","should","might"],ans:1},
+   {type:'mcq',q:'"Should" nima?',opts:["Qat'iy majburiyat","Maslahat","Taqiq","Ruxsat"],ans:1},
+   {type:'mcq',q:'You ___ eat more vegetables. (maslahat)',opts:["must not","can't","should","might"],ans:2},
+   {type:'mcq',q:'"U kelishi mumkin": He ___ come.',opts:["can","must","should","might"],ans:0},
+   {type:'mcq',q:'Modal verb + ?',opts:["V+ed","V+ing","V1","V3"],ans:2},
+   {type:'mcq',q:'"May" nima?',opts:["Qobiliyat","Ruxsat/ehtimol","Majburiyat","Taqiq"],ans:1},
+   {type:'mcq',q:'I ___ be wrong. (ehtimol)',opts:["must","can","might","should"],ans:2},
+   {type:'mcq',q:'"Must" va "have to" farqi:',opts:["Farq yo'q","Must=ichki, have to=tashqi","Must=kelajak","Have to=o'tgan"],ans:1},
+   {type:'mcq',q:'"U borolmaydi": She ___ go.',opts:["cannot","should not","must not","will not"],ans:0},
+   {type:'mcq',q:'You ___ be quiet in library.',opts:["can","might","must","would"],ans:2},
+   {type:'mcq',q:'"Would" qachon?',opts:["Hozir","O'tgan odatdagi/so'rov","Kelajak aniq","Taqiq"],ans:1},
+   {type:'mcq',q:'Could = ?',opts:["Can ning o'tgani","Must ning o'tgani","Will ning o'tgani","Shall ning o'tgani"],ans:0},
+   {type:'mcq',q:'"Ular o\'ynay oladilar": They ___ play.',opts:["can","must","should","might"],ans:0},
+   {type:'mcq',q:'You ___ not tell anyone. (sir)',opts:["should","must","can","might"],ans:1},
+   {type:'mcq',q:'"Needn\'t" = ?',opts:["Kerak emas","Kerak","Mumkin emas","Mumkin"],ans:0},
+   {type:'mcq',q:'Shall I open the window? — bu:',opts:["So'rov","Buyruq","Taqiq","Ehtimol"],ans:0},
+   {type:'mcq',q:'"Men kelishim shart": I ___ come.',opts:["must","should","can","might"],ans:0},
+   {type:'mcq',q:'"Dare" modal:',opts:["Botinmoq","Majburiyat","Taqiq","Ruxsat"],ans:0},
+   {type:'mcq',q:'Used to + V = ?',opts:["Hozir qiladi","O'tganda qilardi","Kelajakda","Hech qachon"],ans:1},
+   {type:'mcq',q:'He ___ have been tired.',opts:["must","should","can","will"],ans:0},
+   {type:'mcq',q:'"Siz bora olasiz": You ___ go.',opts:["can","must","should","might"],ans:0},
+   {type:'mcq',q:'Modal verblar qaysi shaklda bo\'lmaydi?',opts:["V1","V+ing","Negative","Question"],ans:1}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:180,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:'She ___ TV every day.',opts:["watch","watches","watching","watched"],ans:1},
+  {type:'mcq',q:'"go" Past Simple = ?',opts:["went","go","goes","going"],ans:0},
+  {type:'mcq',q:'I ___ call you tomorrow.',opts:["will","am","going","have"],ans:0},
+  {type:'mcq',q:'You ___ smoke. (taqiq)',opts:["should","can","must not","might"],ans:2},
+  {type:'mcq',q:'I ___ my homework already.',opts:["did","do","have done","doing"],ans:2},
+  {type:'mcq',q:'"eat" Past Simple = ?',opts:["ate","eat","eaten","eats"],ans:0},
+  {type:'mcq',q:'She ___ going to study.',opts:["am","is","are","be"],ans:1},
+  {type:'mcq',q:'"Can" = ?',opts:["Majburiyat","Qobiliyat","Shart","Taqiq"],ans:1},
+  {type:'mcq',q:'Present Continuous: ___',opts:["always","now/at the moment","yesterday","tomorrow"],ans:1},
+  {type:'mcq',q:'"write" Past Simple = ?',opts:["wrote","write","written","writes"],ans:0},
+  {type:'mcq',q:'Will manfiy:',opts:["willn't","won't","will no","wont"],ans:1},
+  {type:'mcq',q:'She has never ___ sushi.',opts:["eat","ate","eaten","eating"],ans:2},
+  {type:'mcq',q:'"see" Past Simple = ?',opts:["saw","see","seen","sees"],ans:0},
+  {type:'mcq',q:'Modal verb + ?',opts:["V+ed","V+ing","V1","V3"],ans:2},
+  {type:'mcq',q:'I ___ be wrong (ehtimol).',opts:["must","should","might","can"],ans:2},
+  {type:'mcq',q:'"take" Past Simple = ?',opts:["took","take","taken","takes"],ans:0},
+  {type:'mcq',q:'Future Perfect: By 2030, I ___ finished.',opts:["will have","will be","am","have"],ans:0},
+  {type:'mcq',q:'You ___ eat vegs. (maslahat)',opts:["must not","can't","should","might"],ans:2},
+  {type:'mcq',q:'"come" Past Simple = ?',opts:["came","come","comes","coming"],ans:0},
+  {type:'mcq',q:'She ___ speak 3 languages.',opts:["must","can","should","might"],ans:1},
+  {type:'mcq',q:'Past Perfect: had + ?',opts:["V1","V2","V3","Ving"],ans:2},
+  {type:'mcq',q:'"make" Past Simple = ?',opts:["made","make","makes","making"],ans:0},
+  {type:'mcq',q:'Going to = ?',opts:["Spontan","Reja/niyat","O'tgan","Hozir"],ans:1},
+  {type:'mcq',q:'Used to = ?',opts:["Hozir odati","O'tgan odatdagi","Kelajak","Ehtimol"],ans:1},
+  {type:'mcq',q:'"run" Past Simple = ?',opts:["ran","run","runs","running"],ans:0},
+  {type:'mcq',q:'He ___ (play) — 3rd person Present:',opts:["play","plays","playing","played"],ans:1},
+  {type:'mcq',q:'Needn\'t = ?',opts:["Majburiy","Kerak emas","Mumkin emas","Shart"],ans:1},
+  {type:'mcq',q:'"buy" Past Simple = ?',opts:["bought","buy","buys","buying"],ans:0},
+  {type:'mcq',q:'Could = Can ning ?',opts:["Kelajagi","O'tgan zamoni","Present Perfect","Hoziri"],ans:1},
+  {type:'mcq',q:'"drive" Past Simple = ?',opts:["drove","drive","drives","driving"],ans:0},
+  {type:'mcq',q:'Must vs should farqi:',opts:["Farq yo'q","Must=qat'iy, should=maslahat","Must=kelajak","Should=o'tgan"],ans:1}
+ ]},
+
+// ===== 3. FIZIKA =====
+{id:3,cat:'⚛️ FIZIKA',title:'Mexanika va Elektr',teacher:'Prof. Karimov',img:'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=500',xpReward:550,
+ lessons:[
+  {id:1,title:'Mexanika asoslari',desc:'Kuch va harakat • 10 savol',xp:50,lessonQuiz:[
+   {type:'mcq',q:'F=ma. m=3kg, a=4m/s² — F=?(N)',opts:["13","11","14","12"],ans:3},
+   {type:'mcq',q:'v=s/t. s=60m, t=3s — v=?(m/s)',opts:["21","19","22","20"],ans:3},
+   {type:'mcq',q:'Tezlanish formulasi:',opts:["a=F/m","a=m/F","a=F×m","a=v/F"],ans:0},
+   {type:'mcq',q:'m=10kg, F=50N — a=?(m/s²)',opts:["6","5","4","7"],ans:1},
+   {type:'mcq',q:'1 N = ?',opts:["kg⋅m/s","kg⋅m/s²","kg/m","m/s²"],ans:1},
+   {type:'mcq',q:'v=10m/s, t=4s — s=?(m)',opts:["41","40","39","42"],ans:1},
+   {type:'mcq',q:'Nyuton 2-qonuni:',opts:["F=ma","F=m/a","a=Fm","m=Fa"],ans:0},
+   {type:'mcq',q:'s=150m, t=5s — v=?(m/s)',opts:["31","29","32","30"],ans:3},
+   {type:'mcq',q:"Og'irlik kuchi formulasi:",opts:["G=mg","G=m/g","G=m+g","G=m-g"],ans:0},
+   {type:'mcq',q:'m=5kg, g=10m/s² — G=?(N)',opts:["51","49","50","52"],ans:2}
+  ]},
+  {id:2,title:'Termodinamika',desc:'Issiqlik va harorat • 15 savol',xp:60,lessonQuiz:[
+   {type:'mcq',q:'Issiqlik miqdori formulasi:',opts:["Q=mcΔT","Q=mc/T","Q=m/cT","Q=c/mT"],ans:0},
+   {type:'mcq',q:'Q=mcΔT. m=2kg,c=500,ΔT=10 — Q=?(J)',opts:["10001","9999","10002","10000"],ans:3},
+   {type:'mcq',q:'Suv solishtirma issiqlik sig\'imi:',opts:["420","4200","42000","42"],ans:1},
+   {type:'mcq',q:'0°C = ? Kelvin',opts:["0K","173K","273K","373K"],ans:2},
+   {type:'mcq',q:'100°C = ? Kelvin',opts:["374","372","373","375"],ans:2},
+   {type:'mcq',q:'Issiqlik o\'tkazuvchanlik:',opts:["Yorug'lik","Molekulalar orqali issiqlik","Elektr toki","Magnit"],ans:1},
+   {type:'mcq',q:'Q=6000J, m=2kg, c=300 — ΔT=?',opts:["11","10","9","12"],ans:1},
+   {type:'mcq',q:'Erish jarayonida harorat:',opts:["Ortadi","Kamayadi","O'zgarmaydi","Ikkilanadi"],ans:2},
+   {type:'mcq',q:'Gaz qonunlari:',opts:["Nyuton","Boyl-Mariott","Faraday","Om"],ans:1},
+   {type:'mcq',q:'ΔT=20°C, m=1kg, c=500 — Q=?(J)',opts:["10001","9999","10002","10000"],ans:3},
+   {type:'mcq',q:'Issiqlik sig\'imi SI birligi:',opts:["J","J/kg","J/(kg°C)","°C"],ans:2},
+   {type:'mcq',q:'Konveksiya:',opts:["Qattiqda","Suyuqlik/gazda","Nurlanish","Sovish"],ans:1},
+   {type:'mcq',q:'T=300K = ?°C',opts:["28","26","29","27"],ans:3},
+   {type:'mcq',q:'Bug\'lanish qachon tezlashadi?',opts:["Harorat pastda","Harorat yuqorida","Bosim yuqorida","Hech qachon"],ans:1},
+   {type:'mcq',q:'Absolyut nol = ?',opts:["0°C","0K","-100°C","-273°C"],ans:1}
+  ]},
+  {id:3,title:'Elektr asoslari',desc:'Tok va kuchlanish • 20 savol',xp:70,lessonQuiz:[
+   {type:'mcq',q:'I=U/R. U=12V, R=4Ω — I=?(A)',opts:["3","4","2","5"],ans:0},
+   {type:'mcq',q:'U=IR. I=2A, R=5Ω — U=?(V)',opts:["10","11","9","12"],ans:0},
+   {type:'mcq',q:'Ohm qonuni:',opts:["I=U×R","I=U/R","U=I/R","R=U×I"],ans:1},
+   {type:'mcq',q:'R=U/I. U=20V, I=4A — R=?(Ω)',opts:["6","4","5","7"],ans:2},
+   {type:'mcq',q:'Elektr quvvati formulasi:',opts:["P=UI","P=U/I","P=I/U","P=U+I"],ans:0},
+   {type:'mcq',q:'P=UI. U=220V, I=2A — P=?(W)',opts:["441","439","440","442"],ans:2},
+   {type:'mcq',q:'Ketma-ket ulanganda R = ?',opts:["R1+R2","R1×R2","R1/R2","1/R1+1/R2"],ans:0},
+   {type:'mcq',q:'R1=3Ω, R2=7Ω ketma-ket — R=?(Ω)',opts:["11","9","12","10"],ans:3},
+   {type:'mcq',q:'Parallel ulanishda kuchlanish:',opts:["Qo'shiladi","Teng","Kamayadi","Ikkilanadi"],ans:1},
+   {type:'mcq',q:'W=Pt. P=100W, t=3s — W=?(J)',opts:["300","301","299","302"],ans:0},
+   {type:'mcq',q:'Amper (A) — bu:',opts:["Kuchlanish","Tok kuchi","Qarshilik","Quvvat"],ans:1},
+   {type:'mcq',q:'I=3A, t=10s — q=?(Kl)',opts:["31","29","30","32"],ans:2},
+   {type:'mcq',q:'Volt (V) — bu:',opts:["Tok","Qarshilik","Kuchlanish","Quvvat"],ans:2},
+   {type:'mcq',q:'R1=6Ω, R2=3Ω parallel — R=?(Ω)',opts:["2","3","1","4"],ans:0},
+   {type:'mcq',q:'Elektr energiya birligi:',opts:["Vatt","Joule","Amper","Volt"],ans:1},
+   {type:'mcq',q:'P=500W, U=250V — I=?(A)',opts:["3","2","1","4"],ans:1},
+   {type:'mcq',q:'Supero\'tkazuvchanlik:',opts:["Katta qarshilik","Nol qarshilik","O'zgaruvchan tok","To'g'ri tok"],ans:1},
+   {type:'mcq',q:'1 kVt⋅soat = ?',opts:["3600J","36000J","360000J","3600000J"],ans:3},
+   {type:'mcq',q:'U=110V, R=22Ω — I=?(A)',opts:["5","6","4","7"],ans:0},
+   {type:'mcq',q:'Sigortaning vazifasi:',opts:["Tok kuchaytirish","Haddan oshiq tokdan himoya","Kuchlanish oshirish","Qarshilik kamaytirish"],ans:1}
+  ]},
+  {id:4,title:'Optika',desc:"Yorug'lik qonunlari • 25 savol",xp:85,lessonQuiz:[
+   {type:'mcq',q:"Yorug'lik tezligi vakuumda:",opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"],ans:1},
+   {type:'mcq',q:"Yorug'likning qaytish qonuni:",opts:["Tushish burchagi = qaytish","Tushish > qaytish","Tushish < qaytish","Teng emas"],ans:0},
+   {type:'mcq',q:'D=1/F. F=0.5m — D=?(dioptri)',opts:["3","1","4","2"],ans:3},
+   {type:'mcq',q:"Yig'uvchi linza:",opts:["adi\",\"O"],ans:1},
+   {type:'mcq',q:"Ko'rinma nur to'lqin uzunligi:",opts:["400-700nm","100-400nm","700-1000nm","1-100nm"],ans:0},
+   {type:'mcq',q:"n=c/v. c=3×10⁸, n=1.5 — v=?(×10⁸)",opts:["3","1","4","2"],ans:3},
+   {type:'mcq',q:"Dispersion:",opts:[],ans:1},
+   {type:'mcq',q:"Prizmadan ko'proq siniladigan rang:",opts:["Qizil","Sariq","Yashil","Binafsha"],ans:3},
+   {type:'mcq',q:"Ko'zgu ko'rinish:",opts:["Kattalashtiradi","Kichiklashtiradi","Teskari aks ettiradi","O'zgartirmaydi"],ans:2},
+   {type:'mcq',q:'M=v/u. v=20cm, u=10cm — M=?',opts:["3","1","4","2"],ans:3},
+   {type:'mcq',q:"To'liq ichki qaytish:",opts:["Har doim","Kritik burchakdan katta","Hech qachon","Normal tushganda"],ans:1},
+   {type:'mcq',q:"Foton energiyasi:",opts:["E=hv","E=mv²","E=mc²","E=qU"],ans:0},
+   {type:'mcq',q:'n=c/v. c=3×10⁸, v=2×10⁸ — n=?',opts:["1.5","2.5","0.5","3.5"],ans:0},
+   {type:'mcq',q:"Interferensiya:",opts:["lqinlar qo"],ans:1},
+   {type:'mcq',q:"Lazer nuri:",opts:["Tarqoq","Kogerent va monoxromatik","Ko'p rangli","Sust"],ans:1},
+   {type:'mcq',q:"Ultrabinafsha nurlar:",opts:["Ko'rinadi","Ko'rinmaydi","Infraqizil","Rentgen"],ans:1},
+   {type:'mcq',q:'T=1/f. f=50Hz — T=?(s)',opts:["1.02","-0.98","2.02","0.02"],ans:3},
+   {type:'mcq',q:"Qo'shimcha: qizil + ko'k = ?",opts:["Yashil","Sariq","Magenta","Siyan"],ans:2},
+   {type:'mcq',q:"Yorug'lik yili masofasi:",opts:["9.46×10¹² km","9.46×10¹⁵ km","9.46×10⁹ km","9.46×10¹⁸ km"],ans:1},
+   {type:'mcq',q:"Lyuminessensiya:",opts:["lik\",\"Issiqliksiz yorug"],ans:1},
+   {type:'mcq',q:"Miop nima?",opts:["Uzoqni ko'rmaslik","Yaqinni ko'rmaslik","Rangsizlik","Astigmatizm"],ans:0},
+   {type:'mcq',q:"Gipermeyrop uchun linza:",opts:[],ans:0},
+   {type:'mcq',q:"n=1.5, c=300000km/s — v=?(km/s)",opts:["200001","199999","200002","200000"],ans:3},
+   {type:'mcq',q:"Rentgen kashf etgan:",opts:["Nyuton","Rentgen","Faraday","Planck"],ans:1},
+   {type:'mcq',q:'T=1/f. f=100Hz — T=?(s)',opts:["0.01","1.01","-0.99","2.01"],ans:0}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:200,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:'F=ma. m=4kg, a=5m/s² — F=?(N)',opts:["20","21","19","22"],ans:0},
+  {type:'mcq',q:'I=U/R. U=24V, R=6Ω — I=?(A)',opts:["5","3","6","4"],ans:3},
+  {type:'mcq',q:"Yorug'lik tezligi:",opts:["3×10⁶","3×10⁸","3×10¹⁰","3×10⁴"],ans:1},
+  {type:'mcq',q:'Q=mcΔT. m=1kg,c=4200,ΔT=5 — Q=?(J)',opts:["21001","20999","21000","21002"],ans:2},
+  {type:'mcq',q:'Ohm qonuni:',opts:["I=U×R","I=U/R","U=I/R","R=U×I"],ans:1},
+  {type:'mcq',q:'v=s/t. s=200m, t=10s — v=?(m/s)',opts:["21","19","20","22"],ans:2},
+  {type:'mcq',q:'P=UI. U=110V, I=2A — P=?',opts:["55W","110W","220W","440W"],ans:2},
+  {type:'mcq',q:'G=mg. m=10kg, g=9.8 — G=?(N)',opts:["98","99","97","100"],ans:0},
+  {type:'mcq',q:'100°C = ? K',opts:["100K","273K","373K","473K"],ans:2},
+  {type:'mcq',q:'R1=4Ω, R2=6Ω ketma-ket — R=?(Ω)',opts:["10","11","9","12"],ans:0},
+  {type:'mcq',q:"Yig'uvchi linza:",opts:["adi\",\"O"],ans:1},
+  {type:'mcq',q:'U=IR. I=3A, R=8Ω — U=?(V)',opts:["25","23","26","24"],ans:3},
+  {type:'mcq',q:'Nyuton 2-qonuni:',opts:["F=ma","F=m/a","a=Fm","m=Fa"],ans:0},
+  {type:'mcq',q:'P=W/t. W=600J, t=3s — P=?(W)',opts:["200","201","199","202"],ans:0},
+  {type:'mcq',q:'Dispersion:',opts:[],ans:1},
+  {type:'mcq',q:'n=c/v. c=3×10⁸, v=1.5×10⁸ — n=?',opts:["3","1","4","2"],ans:3},
+  {type:'mcq',q:'Absolyut nol:',opts:["0°C","-273°C","100K","273K"],ans:1},
+  {type:'mcq',q:'q=It. I=5A, t=6s — q=?(Kl)',opts:["30","31","29","32"],ans:0},
+  {type:'mcq',q:"To'liq ichki qaytish:",opts:["Har doim","Kritik burchak oshganda","Hech qachon","Normal"],ans:1},
+  {type:'mcq',q:'a=F/m. F=40N, m=8kg — a=?(m/s²)',opts:["6","4","5","7"],ans:2},
+  {type:'mcq',q:'Konveksiya:',opts:["Qattiqda","Suyuqlik/gazda","Nurlanish","Sovish"],ans:1},
+  {type:'mcq',q:'D=1/F. F=0.25m — D=?(dioptri)',opts:["5","4","3","6"],ans:1},
+  {type:'mcq',q:'Rentgen kashf etgan:',opts:["Nyuton","Rentgen","Faraday","Planck"],ans:1},
+  {type:'mcq',q:'T=1/f. f=100Hz — T=?(s)',opts:["0.01","1.01","-0.99","2.01"],ans:0},
+  {type:'mcq',q:"Og'irlik kuchi:",opts:["G=mg","G=m/g","G=m+g","G=mg²"],ans:0},
+  {type:'mcq',q:'W=Pt. P=200W, t=5s — W=?(J)',opts:["1001","999","1002","1000"],ans:3},
+  {type:'mcq',q:'Parallel kuchlanish:',opts:["Qo'shiladi","Teng","Kamayadi","0"],ans:1},
+  {type:'mcq',q:'ΔT=Q/mc. Q=9000J, m=3kg, c=300 — ΔT=?',opts:["11","9","12","10"],ans:3},
+  {type:'mcq',q:'Plank konstanta:',opts:["6.63×10⁻³⁴","9.1×10⁻³¹","1.6×10⁻¹⁹","3×10⁸"],ans:0},
+  {type:'mcq',q:'R=U/I. U=15V, I=3A — R=?(Ω)',opts:["6","4","7","5"],ans:3},
+  {type:'mcq',q:'Miop:',opts:["Uzoqni ko'rmaslik","Yaqinni ko'rmaslik","Rangsizlik","Astigmatizm"],ans:0}
+ ]},
+
+// ===== 4. KIMYO =====
+{id:4,cat:'🧪 KIMYO',title:'Organik Kimyo',teacher:'Dr. Nazarova',img:'https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=500',xpReward:480,
+ lessons:[
+  {id:1,title:'Organik birikma asoslari',desc:'Uglevodorodlar • 10 savol',xp:45,lessonQuiz:[
+   {type:'mcq',q:'Organik kimyo neni o\'rganadi?',opts:["Metallar","Uglerod birikmalari","Suv","Gazlar"],ans:1},
+   {type:'mcq',q:'Metan CH? — H soni:',opts:["5","3","4","6"],ans:2},
+   {type:'mcq',q:'Uglerod valentligi:',opts:["2","3","4","5"],ans:2},
+   {type:'mcq',q:'Etan C₂H? — H soni:',opts:["6","7","5","8"],ans:0},
+   {type:'mcq',q:'Uglevodorod:',opts:["Faqat C","C va H","C, H va O","Faqat H"],ans:1},
+   {type:'mcq',q:'Neft asosan:',opts:["Suv","Uglevodorodlar","Tuzlar","Metallar"],ans:1},
+   {type:'mcq',q:'Propan C₃H? — H soni:',opts:["9","7","8","10"],ans:2},
+   {type:'mcq',q:'Organik birikma sharti:',opts:["Metal","Uglerod","Suv","Kislorod"],ans:1},
+   {type:'mcq',q:'CH₄ qaysi guruh?',opts:["Alken","Alkin","Alkan","Aromatik"],ans:2},
+   {type:'mcq',q:'Butan C₄H? — H soni:',opts:["10","11","9","12"],ans:0}
+  ]},
+  {id:2,title:'Alkanlar',desc:'Metandan oktangacha • 15 savol',xp:55,lessonQuiz:[
+   {type:'mcq',q:'Alkanlar formulasi:',opts:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₋₂","CₙHₙ"],ans:1},
+   {type:'mcq',q:'Pentan n=5 — H soni:',opts:["13","12","11","14"],ans:1},
+   {type:'mcq',q:'Metan yonish reaksiyasi:',opts:["CH₄+O₂","CH₄+2O₂→CO₂+2H₂O","CH₄+H₂O","CH₄+CO₂"],ans:1},
+   {type:'mcq',q:'Alkanlar kimyoviy:',opts:["Juda faol","Nisbatan faolsiz","Portlovchi","Suvda eriydi"],ans:1},
+   {type:'mcq',q:'Geksan C₆H? — H soni:',opts:["14","15","13","16"],ans:0},
+   {type:'mcq',q:'Alkan nomi qo\'shimchasi:',opts:["-en","-in","-an","-ol"],ans:2},
+   {type:'mcq',q:'Izomeria:',opts:["Bir xil tuzilish","Bir xil formula, boshqa tuzilish","Turli formula","Turli massa"],ans:1},
+   {type:'mcq',q:'Geptan C₇H? — H soni:',opts:["17","16","15","18"],ans:1},
+   {type:'mcq',q:'Alkanlar suvda:',opts:["Yaxshi eriydi","Erimaydi","Portlaydi","Reaksiyaga kirishadi"],ans:1},
+   {type:'mcq',q:'Neft mahsuloti:',opts:["Suv","Benzin","Havo","Tuz"],ans:1},
+   {type:'mcq',q:'Oktan C₈H? — H soni:',opts:["19","17","20","18"],ans:3},
+   {type:'mcq',q:'Alkan galogenlanishi:',opts:["Qo'shilish","O'rinbosish","Parchalanish","Birikish"],ans:1},
+   {type:'mcq',q:'Metan hidi:',opts:["Sariq, hidli","Rangsiz, hidsiz","Qizil, achchiq","Ko'k, nordon"],ans:1},
+   {type:'mcq',q:'n=1 (metan) — C soni:',opts:["2","0","3","1"],ans:3},
+   {type:'mcq',q:'Tabiiy gaz asosan:',opts:["Etan","Propan","Metan","Butan"],ans:2}
+  ]},
+  {id:3,title:'Alkenlar va Alkinlar',desc:"Qo'sh va uch bog'lar • 20 savol",xp:65,lessonQuiz:[
+   {type:'mcq',q:'Alkenlar formulasi:',opts:["CₙH₂ₙ₊₂","CₙH₂ₙ","CₙH₂ₙ₋₂","CₙHₙ"],ans:1},
+   {type:'mcq',q:'Etilen formulasi:',opts:["C₂H₆","C₂H₄","C₂H₂","C₃H₄"],ans:1},
+   {type:'mcq',q:'Alkinlar CₙH(2n-2). n=2 — H soni:',opts:["3","1","4","2"],ans:3},
+   {type:'mcq',q:'Alken nomi:',opts:["-an","-in","-en","-ol"],ans:2},
+   {type:'mcq',q:"Qo'sh bog'li:",opts:["Alkan","Alken","Alkin","Aromatik"],ans:1},
+   {type:'mcq',q:'Propen C₃H? (alken):',opts:["7","5","6","8"],ans:2},
+   {type:'mcq',q:'Etilen + Br₂:',opts:["CH₄+Cl₂","C₂H₄+Br₂→C₂H₄Br₂","C₂H₄+O₂","C₂H₆→C₂H₄"],ans:1},
+   {type:'mcq',q:'Alkin nomi:',opts:["-an","-en","-in","-ol"],ans:2},
+   {type:'mcq',q:'Atsetilen C₂H? (alkin):',opts:["2","3","1","4"],ans:0},
+   {type:'mcq',q:'Uch bog\'li:',opts:["Alkan","Alken","Alkin","Ester"],ans:2},
+   {type:'mcq',q:'Markovnikov qoidasi:',opts:["Parchalanish","Qo'shilish","O'rinbosish","Oksidlanish"],ans:1},
+   {type:'mcq',q:'Buten C₄H? (alken):',opts:["8","9","7","10"],ans:0},
+   {type:'mcq',q:'Polimerizatsiya:',opts:["Gidroliz","Polimer olish","Oksidlanish","Qaytarilish"],ans:1},
+   {type:'mcq',q:'Plastmassa asosi:',opts:["Alkan","Polimer","Benzol","Kislota"],ans:1},
+   {type:'mcq',q:'Penten C₅H? (alken):',opts:["11","9","10","12"],ans:2},
+   {type:'mcq',q:'Atsetilen + brom suvi:',opts:["O'zgarmaydi","Rangsizlanadi","Ko'k bo'ladi","Parchalanadi"],ans:1},
+   {type:'mcq',q:'Gidrogenlanish:',opts:["H₂ qo'shilishi","H₂ ajralishi","O₂ qo'shilishi","Parchalanish"],ans:0},
+   {type:'mcq',q:'Geksin C₆H? (alkin):',opts:["11","9","12","10"],ans:3},
+   {type:'mcq',q:'Alken va alkin farqi:',opts:["sh bog","\",","","Farq yo'q"],ans:1},
+   {type:'mcq',q:'Etilen mahsulot:',opts:["Benzin","Polietilen","Suv","Tuz"],ans:1}
+  ]},
+  {id:4,title:'Benzol va aromatiklar',desc:'Halqali birikmalar • 25 savol',xp:80,lessonQuiz:[
+   {type:'mcq',q:'Benzol formulasi:',opts:["C₆H₁₂","C₆H₁₄","C₆H₆","C₆H₁₀"],ans:2},
+   {type:'mcq',q:'Benzol halqasida C-H:',opts:["4","5","6","8"],ans:2},
+   {type:'mcq',q:'Benzol C₆H? — H soni:',opts:["7","5","8","6"],ans:3},
+   {type:'mcq',q:'Aromatik reaksiya:',opts:["proq qo","proq o"],ans:1},
+   {type:'mcq',q:'Toluol = benzol + ?',opts:["CH₄","CH₃","C₂H₅","H₂"],ans:1},
+   {type:'mcq',q:'Toluol C₇H? — H soni:',opts:["9","8","7","10"],ans:1},
+   {type:'mcq',q:'Benzol nitrolash:',opts:["Anilin","Nitrobenzol","Fenol","Xlorbenzol"],ans:1},
+   {type:'mcq',q:'Koks qayerdan?',opts:["Neft","Ko'mir","Gaz","Plastmassa"],ans:1},
+   {type:'mcq',q:'Fenol formulasi:',opts:["C₆H₅OH","C₆H₆","C₆H₅Cl","C₆H₅NH₂"],ans:0},
+   {type:'mcq',q:'Benzol mol massasi (C=12,H=1):',opts:["79","78","77","80"],ans:1},
+   {type:'mcq',q:'Aromatik xalqa:',opts:["4C","5C","6C","8C"],ans:2},
+   {type:'mcq',q:'Naftalen formulasi:',opts:["C₁₀H₈","C₈H₁₀","C₁₀H₁₀","C₁₂H₁₀"],ans:0},
+   {type:'mcq',q:'Etilbenzol C₈H? — H soni:',opts:["10","11","9","12"],ans:0},
+   {type:'mcq',q:'Benzol suvda:',opts:["Yaxshi eriydi","Erimaydi","Portlaydi","Reaksiya"],ans:1},
+   {type:'mcq',q:'Ksilol:',opts:["Monometilbenzol","Dimetilbenzol","Trimetilbenzol","Tetrabenzol"],ans:1},
+   {type:'mcq',q:'Toluol mol massasi (C=12,H=1):',opts:["92","93","91","94"],ans:0},
+   {type:'mcq',q:'Benzol kashf:',opts:["Berzelius","Faradey","Kekule","Nyuton"],ans:1},
+   {type:'mcq',q:'Benzol tuzilishi:',opts:["Berzelius","Faradey","Kekule","Lomonosov"],ans:2},
+   {type:'mcq',q:'Naftalen C₁₀H? — H soni:',opts:["9","7","8","10"],ans:2},
+   {type:'mcq',q:'Aromatik xid:',opts:["Hidsiz","Xushbo'y","Achchiq","Nordon"],ans:1},
+   {type:'mcq',q:'DDT:',opts:["Dori","Oziq-ovqat","Insektitsid (zaharli)","Parfyum"],ans:2},
+   {type:'mcq',q:'Benzol yonish:',opts:["CO+H₂O","CO₂+H₂O","CH₄+O₂","C+H₂"],ans:1},
+   {type:'mcq',q:'Benzol sanoatda:',opts:["Suvdan","Neft va ko'mirdan","Havadan","Tuproqdan"],ans:1},
+   {type:'mcq',q:'Anilin formulasi:',opts:["C₆H₅OH","C₆H₅NH₂","C₆H₅Cl","C₆H₅CH₃"],ans:1},
+   {type:'mcq',q:'Benzoldan polimer olish:',opts:["2","1","0","3"],ans:1}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:170,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:'Metan CH? — H soni:',opts:["5","3","4","6"],ans:2},
+  {type:'mcq',q:'Alkanlar formulasi:',opts:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₋₂","CₙHₙ"],ans:1},
+  {type:'mcq',q:'Etilen formulasi:',opts:["C₂H₆","C₂H₄","C₂H₂","CH₄"],ans:1},
+  {type:'mcq',q:'Benzol C₆H? — H soni:',opts:["7","5","8","6"],ans:3},
+  {type:'mcq',q:'Organik kimyo:',opts:["Metallar","C birikmalari","Suv","Gazlar"],ans:1},
+  {type:'mcq',q:'Propan C₃H? — H soni:',opts:["9","7","8","10"],ans:2},
+  {type:'mcq',q:'Alkin formulasi:',opts:["CₙH₂ₙ₊₂","CₙH₂ₙ","CₙH₂ₙ₋₂","CₙHₙ"],ans:2},
+  {type:'mcq',q:'Pentan C₅H? — H soni:',opts:["13","11","12","14"],ans:2},
+  {type:'mcq',q:'Atsetilen bog\'i:',opts:["sh\",\"Uch\",\"To"],ans:2},
+  {type:'mcq',q:'Toluol C₇H? — H soni:',opts:["9","8","7","10"],ans:1},
+  {type:'mcq',q:'Polimerizatsiya:',opts:["Parchalanish","Polimer olish","Oksidlanish","Gidroliz"],ans:1},
+  {type:'mcq',q:'Oktan C₈H? — H soni:',opts:["19","17","20","18"],ans:3},
+  {type:'mcq',q:'Benzol tuzilishi:',opts:["Berzelius","Faradey","Kekule","Nyuton"],ans:2},
+  {type:'mcq',q:'Buten C₄H? (alken):',opts:["8","9","7","10"],ans:0},
+  {type:'mcq',q:'Fenol formulasi:',opts:["C₆H₅OH","C₆H₆","C₆H₅Cl","C₆H₅NH₂"],ans:0},
+  {type:'mcq',q:'Geptan C₇H? — H soni:',opts:["17","16","15","18"],ans:1},
+  {type:'mcq',q:'Metan yonish:',opts:["CH₄+O₂","CH₄+2O₂→CO₂+2H₂O","CH₄+H₂O","CH₄+CO₂"],ans:1},
+  {type:'mcq',q:'Atsetilen C₂H? — H soni:',opts:["2","3","1","4"],ans:0},
+  {type:'mcq',q:'Tabiiy gaz asosan:',opts:["Etan","Propan","Metan","Butan"],ans:2},
+  {type:'mcq',q:'Benzol mol massasi:',opts:["79","78","77","80"],ans:1},
+  {type:'mcq',q:'Alkan faolligi:',opts:["Juda faol","Nisbatan faolsiz","Portlovchi","Suvda eriydi"],ans:1},
+  {type:'mcq',q:'Geksin C₆H? (alkin):',opts:["11","9","12","10"],ans:3},
+  {type:'mcq',q:'Naftalen formulasi:',opts:["C₁₀H₈","C₈H₁₀","C₁₀H₁₀","C₁₂H₁₀"],ans:0},
+  {type:'mcq',q:'Uglerod valentligi:',opts:["5","3","4","6"],ans:2},
+  {type:'mcq',q:'Izomeria:',opts:["Bir xil tuzilish","Bir xil formula, boshqa tuzilish","Turli formula","Turli massa"],ans:1},
+  {type:'mcq',q:'Geksan C₆H? (alkan):',opts:["15","13","16","14"],ans:3},
+  {type:'mcq',q:'Markovnikov qoidasi:',opts:["Parchalanish","Qo'shilish","O'rinbosish","Oksidlanish"],ans:1},
+  {type:'mcq',q:'Propen C₃H? (alken):',opts:["7","5","6","8"],ans:2},
+  {type:'mcq',q:'Aromatik reaksiya:',opts:["proq qo","proq o"],ans:1},
+  {type:'mcq',q:'Naftalen C₁₀H? — H soni:',opts:["9","7","8","10"],ans:2},
+  {type:'mcq',q:'Benzol kashf:',opts:["Berzelius","Faradey","Kekule","Lomonosov"],ans:2}
+ ]},
+
+// ===== 5. TARIX =====
+{id:5,cat:'📜 TARIX',title:"O'zbekiston Tarixi",teacher:'Prof. Toshmatov',img:'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=500',xpReward:400,
+ lessons:[
+  {id:1,title:'Qadimgi davr',desc:"O'rta Osiyo tarixi • 10 savol",xp:40,lessonQuiz:[
+   {type:'mcq',q:"O'rta Osiyo qadimgi davlati:",opts:["Rim","Baqtriya","Gretsiya","Misr"],ans:1},
+   {type:'mcq',q:"O'zbekiston mustaqilligi yili:",opts:["1992","1990","1993","1991"],ans:3},
+   {type:'mcq',q:'Zardushtiylik qayerda paydo bo\'ldi?',opts:["Arabistonda","Hindistonda',\"O'rta Osiyoda\",'Xitoyda"],ans:2},
+   {type:'mcq',q:'Qadimgi Samarqand nomi:',opts:["Marakanda","Buxoro","Termiz","Xiva"],ans:0},
+   {type:'mcq',q:'Aleksandr Makedonskiy O\'rta Osiyoni:',opts:["V asrda","IV asrda mil.avv","III asrda","II asrda"],ans:1},
+   {type:'mcq',q:"O'zbekiston poytaxti:",opts:["Toshkent","Samarqand","Buxoro","Namangan"],ans:0},
+   {type:'mcq',q:'Avesto tili:',opts:["Arab","Fors","Avesto","Xitoy"],ans:2},
+   {type:'mcq',q:'Kushon podsholigi gullagan:',opts:["I-III asrlar","V-VII asrlar","IX-X asrlar","XII-XIII asrlar"],ans:0},
+   {type:'mcq',q:"Ipak yo'li:",opts:[],ans:0},
+   {type:'mcq',q:"O'zbekistonda nechta viloyat?",opts:["13","11","12","14"],ans:2}
+  ]},
+  {id:2,title:'Somoniylar davri',desc:'IX-X asrlar • 15 savol',xp:50,lessonQuiz:[
+   {type:'mcq',q:'Somoniylar davlatini kim asos soldi?',opts:["Amir Temur","Ismoil Somoniy","Ulug'bek","Bobur"],ans:1},
+   {type:'mcq',q:'Somoniylar poytaxti:',opts:["Buxoro","Samarqand","Toshkent","Xiva"],ans:0},
+   {type:'mcq',q:'Ibn Sino qachon?',opts:["VII-VIII asr","IX-X asr","X-XI asr","XII-XIII asr"],ans:2},
+   {type:'mcq',q:'Al-Xorazmiy:',opts:["Fizika","Algebra va algoritm","Kimyo","Biologiya"],ans:1},
+   {type:'mcq',q:'Ibn Sinoning mashhur asari:',opts:["shifo","qonun","tarix","falsafa"],ans:0},
+   {type:'mcq',q:'Somoniylar dini:',opts:["Zardushtiylik","Buddizm","Islom","Xristianlik"],ans:2},
+   {type:'mcq',q:'Rudakiy qaysi tilda yozdi?',opts:["Fors","Arab","O'zbek","Turk"],ans:0},
+   {type:'mcq',q:'Somoniylar qachon tugadi?',opts:["X asr oxiri","XI asr","XII asr","XIII asr"],ans:0},
+   {type:'mcq',q:'Beruniy:',opts:["Faqat matematika","Faqat astronomiya","Ko'p fanlar","Faqat tarix"],ans:2},
+   {type:'mcq',q:'Al-Farobiy laqabi:',opts:["soniy","soniy!","soniy?","Boshqa"],ans:0},
+   {type:'mcq',q:'Somoniylar hududi:',opts:["Faqat Buxoro","Butun O'rta Osiyo","Faqat Samarqand","Arabiston"],ans:1},
+   {type:'mcq',q:'Somoniylar tangasi:',opts:["Bronza","Mis","Kumush","Oltin"],ans:2},
+   {type:'mcq',q:'Ismoil Somoniy maqbarasi:',opts:["Buxoro","Samarqand","Toshkent","Xiva"],ans:0},
+   {type:'mcq',q:'Somoniylar davridagi madrasa:',opts:["Ulug'bek madrasasi","Mir Arab madrasasi","Chor Minor","Ko'k Gumbaz"],ans:1},
+   {type:'mcq',q:'Ibn Sino asarlarida qancha kitob?',opts:["50","100","450","1000"],ans:2}
+  ]},
+  {id:3,title:'Temuriylar davri',desc:'XIV-XV asrlar • 20 savol',xp:60,lessonQuiz:[
+   {type:'mcq',q:'Amir Temur taxtga o\'tirdi:',opts:["1350","1370","1380","1390"],ans:1},
+   {type:'mcq',q:'Amir Temur poytaxti:',opts:["Samarqand","Buxoro","Toshkent","Xiva"],ans:0},
+   {type:'mcq',q:'Temuriylar obidasi:',opts:["Ismoil Somoniy maqbarasi","Shoh-i Zinda","Chor Minor","Ko'k Gumbaz"],ans:1},
+   {type:'mcq',q:'Ulug\'bek kim edi?',opts:["navarasi","o'g'li","ukasi","akasi"],ans:0},
+   {type:'mcq',q:'Ulug\'bek rasadxonasi:',opts:["Toshkent","Buxoro","Samarqand","Xiva"],ans:2},
+   {type:'mcq',q:'Navoiy qaysi tilda?',opts:["Arab","Fors","Eski o'zbek","Rus"],ans:2},
+   {type:'mcq',q:'Amir Temur vafot etdi:',opts:["1406","1404","1407","1405"],ans:3},
+   {type:'mcq',q:'Temur kimga vasiyat qildi?',opts:["Ulug'bekka","Shahruxga","Miron Shahga","Bobur"],ans:1},
+   {type:'mcq',q:'Temur qayerda dafn etildi?',opts:["Samarqand","Buxoro","Toshkent","Xiva"],ans:0},
+   {type:'mcq',q:'Temuriylar rivojlagan soha:',opts:["Dengizchilik","Me'morchilik va ilm","Ko'chmanchilik","Dehqonchilik"],ans:1},
+   {type:'mcq',q:'Bobur kim?',opts:["Temurning navarasi","Temurning o'g'li","Ulug'bekning o'g'li","Shahruxning navarasi"],ans:0},
+   {type:'mcq',q:'Bobur Hindistonda qaysi sulola?',opts:["Boburiylar","Temuriylar","Somoniylar","Safaviylar"],ans:0},
+   {type:'mcq',q:'Ulug\'bek rasadxonasida yulduz soni:',opts:["500","818","1000","1500"],ans:1},
+   {type:'mcq',q:'Navoiy "Xamsa" nechta doston?',opts:["3","4","5","6"],ans:2},
+   {type:'mcq',q:'Ulug\'bek vafot:',opts:["1450","1449","1448","1451"],ans:1},
+   {type:'mcq',q:'Bibixonim masjidi:',opts:["Toshkent","Samarqand","Buxoro","Xiva"],ans:1},
+   {type:'mcq',q:'Shoh-i Zinda:',opts:["Madrasa","Saroy","Maqbaralar majmuasi","Rasadxona"],ans:2},
+   {type:'mcq',q:'Temurning laqabi:',opts:["Sohibqiron","Olijanob","Temirqo'l","Buyuk"],ans:0},
+   {type:'mcq',q:'"Temur tuzuklari":',opts:["She'rlar","Qonunlar to'plami","Xaritalar","Darslik"],ans:1},
+   {type:'mcq',q:'Navoiyning to\'liq ismi boshlanishi:',opts:["Ali Shir","Nizomiddin","Mir","Zahiriddin"],ans:1}
+  ]},
+  {id:4,title:'Mustaqillik davri',desc:"1991-hozir • 25 savol",xp:75,lessonQuiz:[
+   {type:'mcq',q:"O'zbekiston mustaqillik yili:",opts:["1992","1990","1993","1991"],ans:3},
+   {type:'mcq',q:"O'zbekistonning birinchi prezidenti:",opts:["Sh.Mirziyoev","I.Karimov","A.Aripov","B.Toshmatov"],ans:1},
+   {type:'mcq',q:"Konstitutsiya qabul qilindi:",opts:["1992","1993","1991","1994"],ans:0},
+   {type:'mcq',q:"Hozirgi prezident:",opts:["I.Karimov","Sh.Mirziyoev","A.Aripov","B.Toshmatov"],ans:1},
+   {type:'mcq',q:"Valyuta nomi:",opts:["m\",",",",","],ans:0},
+   {type:'mcq',q:"BMTga qachon?",opts:["1990","1991","1992","1993"],ans:2},
+   {type:'mcq',q:"Bayroqdagi ranglar soni:",opts:["4","2","3","5"],ans:2},
+   {type:'mcq',q:"Mustaqillik kuni:",opts:["1-yanvar","8-mart","1-sentabr","9-may"],ans:2},
+   {type:'mcq',q:"SSSRdan ajralish yili:",opts:["1992","1991","1990","1993"],ans:1},
+   {type:'mcq',q:"Iqtisodiyot asosi:",opts:["Dengizchilik","Paxta, gaz, oltin","Baliqchilik","Sanoat"],ans:1},
+   {type:'mcq',q:"Yangi O'zbekiston strategiyasi:",opts:["2016","2017","2021","2022"],ans:2},
+   {type:'mcq',q:"Sh.Mirziyoev hokimiyatga keldi:",opts:["2016","2017","2015","2018"],ans:0},
+   {type:'mcq',q:"SCO sammiti Samarqandda:",opts:["2020","2021","2022","2023"],ans:2},
+   {type:'mcq',q:"Aholi taxminan necha million?",opts:["37","35","38","36"],ans:3},
+   {type:'mcq',q:"O'zbekiston mintaqasi:",opts:[],ans:1},
+   {type:'mcq',q:"Milliy valyuta kiritildi:",opts:["1995","1993","1994","1996"],ans:2},
+   {type:'mcq',q:"Davlat tili:",opts:[],ans:1},
+   {type:'mcq',q:"Toshkent metro qurilgan:",opts:["1977","1978","1976","1979"],ans:0},
+   {type:'mcq',q:"Viloyatlar soni:",opts:["10","12","13","14"],ans:1},
+   {type:'mcq',q:"O'zbekiston yuzasi (km²):",opts:["448000","448001","447999","448002"],ans:0},
+   {type:'mcq',q:"'O'zbekiston-2030' maqsadi:",opts:["Harbiy kuch","Iqtisodiy rivojlanish","Diplomatiya","Sport"],ans:1},
+   {type:'mcq',q:"Olimpiada oltin medal:",opts:["1996","2000","2004","2008"],ans:0},
+   {type:'mcq',q:"Vizasiz ochilgan yil:",opts:["2023","2021","2024","2022"],ans:3},
+   {type:'mcq',q:"GDPda asosiy soha:",opts:["Turizm","Sanoat va xizmat","Dengizchilik","Qishloq xo'jaligi"],ans:1},
+   {type:'mcq',q:"SCO - bu:",opts:["Sport","Shanxay hamkorlik","Savdo","Sayyohlik"],ans:1}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:150,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:"O'zbekiston mustaqilligi:",opts:["1992","1990","1993","1991"],ans:3},
+  {type:'mcq',q:'Somoniylar poytaxti:',opts:["Samarqand","Buxoro","Toshkent","Xiva"],ans:1},
+  {type:'mcq',q:'Amir Temur laqabi:',opts:["Olijanob","Sohibqiron","Temirqo'l","Ulug'"],ans:1},
+  {type:'mcq',q:"O'zbekiston poytaxti:",opts:["Toshkent","Samarqand","Buxoro","Namangan"],ans:0},
+  {type:'mcq',q:'Ibn Sino sohasi:',opts:["Matematika","Tibbiyot","Fizika","Kimyo"],ans:1},
+  {type:'mcq',q:'Amir Temur taxtga:',opts:["1370","1371","1369","1372"],ans:0},
+  {type:'mcq',q:"Hozirgi prezident:",opts:["I.Karimov","Sh.Mirziyoev","A.Aripov","B.Toshmatov"],ans:1},
+  {type:'mcq',q:'Ulug\'bek vafot:',opts:["1450","1449","1448","1451"],ans:1},
+  {type:'mcq',q:'Al-Xorazmiy:',opts:["Fizika","Algebra","Kimyo","Biologiya"],ans:1},
+  {type:'mcq',q:"Navoiy tili:",opts:["zbek\",",",",","],ans:0},
+  {type:'mcq',q:'Bibixonim masjidi:',opts:["Toshkent","Samarqand","Buxoro","Xiva"],ans:1},
+  {type:'mcq',q:'Somoniylar poytaxti:',opts:["Buxoro","Samarqand","Toshkent","Xiva"],ans:0},
+  {type:'mcq',q:'Bobur qayerda sulola?',opts:["Eron","Hindiston","Afg'oniston","Xitoy"],ans:1},
+  {type:'mcq',q:'Konstitutsiya yili:',opts:["1993","1991","1992","1994"],ans:2},
+  {type:'mcq',q:'Kushon podsholigi:',opts:["I-III asr","V-VII asr","IX-X asr","XII-XIII asr"],ans:0},
+  {type:'mcq',q:'Ismoil Somoniy maqbarasi:',opts:["Buxoro","Samarqand","Toshkent","Xiva"],ans:0},
+  {type:'mcq',q:'Navoiy "Xamsa" nechta?',opts:["3","4","5","6"],ans:2},
+  {type:'mcq',q:'Mustaqillik kuni:',opts:["1-sentabr","1-sentabr!","1-sentabr?","Boshqa"],ans:0},
+  {type:'mcq',q:'Amir Temur vafot:',hint:'1405',opts:["1400","1405","1410","1415"],ans:1},
+  {type:'mcq',q:'Rudakiy tili:',opts:["Fors","Arab","O'zbek","Turk"],ans:0},
+  {type:'mcq',q:"Ipak yo'li:",opts:[],ans:0},
+  {type:'mcq',q:"Valyuta nomi:",opts:["m\",",",",","],ans:0},
+  {type:'mcq',q:'Ulug\'bek rasadxonasi:',opts:["Toshkent","Buxoro","Samarqand","Xiva"],ans:2},
+  {type:'mcq',q:'Ibn Sino asari:',opts:["shifo","qonun","tarix","falsafa"],ans:0},
+  {type:'mcq',q:'Shoh-i Zinda:',opts:["Madrasa","Saroy","Maqbaralar","Rasadxona"],ans:2},
+  {type:'mcq',q:"Viloyatlar soni:",opts:["13","11","14","12"],ans:3},
+  {type:'mcq',q:'Marakanda:',opts:["Buxoro","Samarqand","Termiz","Xorazm"],ans:1},
+  {type:'mcq',q:"O'zbekiston davlat tili:",opts:["zbek\",",",",","],ans:0},
+  {type:'mcq',q:'Temuriylar poytaxti:',opts:["Buxoro","Samarqand","Toshkent","Xiva"],ans:1},
+  {type:'mcq',q:'Sh.Mirziyoev hokimiyatga:',opts:["2017","2016","2015","2018"],ans:1},
+  {type:'mcq',q:"O'zbekiston mintaqasi:",opts:[],ans:1}
+ ]},
+
+// ===== 6. DASTURLASH =====
+{id:6,cat:'💻 DASTURLASH',title:'Python Pro',teacher:'Alisher Dev',img:'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=500',xpReward:600,
+ lessons:[
+  {id:1,title:"O'zgaruvchilar",desc:'int, str, float, bool • 10 savol',xp:50,lessonQuiz:[
+   {type:'mcq',q:'Python da chiqarish funksiyasi:',opts:["print","input","output","return"],ans:0},
+   {type:'mcq',q:'x=5 da type(x):',opts:["int","float","bool"],ans:1},
+   {type:'mcq',q:'x="salom" da type(x):',opts:["str","int","float","bool"],ans:0},
+   {type:'mcq',q:'Mantiqiy qiymat:',opts:["0 yoki 1","True yoki False","Yes/No","Ha/Yo'q"],ans:1},
+   {type:'mcq',q:'3.14 qaysi tur:',opts:["float","int","str","bool"],ans:0},
+   {type:'mcq',q:'x=None — bu:',opts:["0","Bo'sh satr","Qiymat yo'qligi","Xato"],ans:2},
+   {type:'mcq',q:'Python da izoh belgisi:',opts:["#","//","/*","--"],ans:0},
+   {type:'mcq',q:"O'zgaruvchi nomi qanday boshlanadi?",opts:["Raqam","Harf yoki _","@","!"],ans:1},
+   {type:'mcq',q:'x=10; x=x+5 — x=?',opts:["15","16","14","17"],ans:0},
+   {type:'mcq',q:'print(type(True)):',opts:["int","bool","str","float"],ans:1}
+  ]},
+  {id:2,title:'Shartlar',desc:'if, elif, else • 15 savol',xp:60,lessonQuiz:[
+   {type:'mcq',q:'if 5 > 3: — shart:',opts:["False","True","Xato","None"],ans:1},
+   {type:'mcq',q:'"Teng emas" belgisi:',opts:["!=","==","<=",">="],ans:0},
+   {type:'mcq',q:'if...else — bu:',opts:["Tsikl","Shart","Funksiya","Import"],ans:1},
+   {type:'mcq',q:'x=7; if x>5: natija:',opts:["katta","katta!","katta?","Boshqa"],ans:0},
+   {type:'mcq',q:'elif nima?',opts:["Faqat birinchi","Qo'shimcha shartlar","Oxirgi shart","Tsikl"],ans:1},
+   {type:'mcq',q:'and operatori:',opts:["Bittasi rost","Hammasi rost","Hech biri","Farqi yo'q"],ans:1},
+   {type:'mcq',q:'not True = ?',opts:["False","True","None","0"],ans:0},
+   {type:'mcq',q:'or operatori:',opts:["Hammasi rost","Bittasi rost","Hech biri","Farqi yo'q"],ans:1},
+   {type:'mcq',q:'5 == 5 — natija:',opts:["True","False","None","1"],ans:0},
+   {type:'mcq',q:'if 0: — shart:',opts:["True","False","Xato","None"],ans:1},
+   {type:'mcq',q:'10 % 3 = ?',opts:["2","1","0","3"],ans:1},
+   {type:'mcq',q:'"Teng" belgisi:',opts:["=","==","===","!="],ans:1},
+   {type:'mcq',q:'x=4; x>=4 — natija:',opts:["True","False","None","1"],ans:0},
+   {type:'mcq',q:'pass kalit so\'zi:',opts:["Chiqish","Hech narsa","Keyingi","Qaytarish"],ans:1},
+   {type:'mcq',q:'bool(0) = ?',opts:["False","True","None","0"],ans:0}
+  ]},
+  {id:3,title:'Tsikllar',desc:'for, while • 20 savol',xp:70,lessonQuiz:[
+   {type:'mcq',q:'range(5) nechta element?',opts:["5","6","4","7"],ans:0},
+   {type:'mcq',q:'for i in range(3): — necha marta?',opts:["2","3","4","0"],ans:1},
+   {type:'mcq',q:'range(1,6) oxirgi element:',opts:["6","4","5","7"],ans:2},
+   {type:'mcq',q:'while True: — bu:',opts:["Bir marta","Cheksiz tsikl","Hech marta","Xato"],ans:1},
+   {type:'mcq',q:'break nima qiladi:',opts:["toxtadi","toxtadi!","toxtadi?","Boshqa"],ans:0},
+   {type:'mcq',q:'continue nima?',opts:["Tsiklni to'xtatadi","Keyingi iteratsiyaga","Funksiyadan chiqadi","Xato"],ans:1},
+   {type:'mcq',q:'for i in range(3): i qiymatlari: 0,1,?',opts:["3","2","1","4"],ans:1},
+   {type:'mcq',q:'Ichki tsikl:',opts:["Tsikl ichida tsikl","Funksiya ichida","Shart ichida","Modul"],ans:0},
+   {type:'mcq',q:'len([1,2,3,4,5]) = ?',opts:["6","4","5","7"],ans:2},
+   {type:'mcq',q:'enumerate() nima?',opts:["O'chirish","Indeks va qiymat","Tartiblash","Qidirish"],ans:1},
+   {type:'mcq',q:'sum([1,2,3,4]) = ?',opts:["11","9","12","10"],ans:3},
+   {type:'mcq',q:'range(0,10,2) qadami:',opts:["1","2","3","5"],ans:1},
+   {type:'mcq',q:'range(0,10,2) elementlar soni:',opts:["6","5","4","7"],ans:1},
+   {type:'mcq',q:'for x in "salom": — necha marta?',opts:["1","4","5","6"],ans:2},
+   {type:'mcq',q:'x=0; for i in range(5): x+=1 — x=?',opts:["6","4","7","5"],ans:3},
+   {type:'mcq',q:'while i<3: i+=1 — i=0 dan necha marta?',opts:["2","3","4","0"],ans:1},
+   {type:'mcq',q:'list(range(3)) = ?',opts:['[0, 1, 2]','[1, 2, 3]','[0, 1, 2, 3]','[1, 2]'],ans:0},
+   {type:'mcq',q:'for _ in range(n): — _ nima?',opts:["Maxsus o'zgaruvchi","Xato","Indeks","Qiymat"],ans:0},
+   {type:'mcq',q:'max([3,1,4,1,5]) = ?',opts:["6","4","5","7"],ans:2},
+   {type:'mcq',q:'zip() funksiyasi:',opts:["Siqish","Ikkita ro'yxat birlashtirish","O'chirish","Tartiblash"],ans:1}
+  ]},
+  {id:4,title:'Funksiyalar',desc:'def va return • 25 savol',xp:85,lessonQuiz:[
+   {type:'mcq',q:'def nima uchun?',opts:["zgaruvchi\",\"Funksiya yaratish\",",","],ans:1},
+   {type:'mcq',q:'def salom(): — nima yaratdi?',opts:["funksiya","o'zgaruvchi","tsikl","shart"],ans:0},
+   {type:'mcq',q:'return nima?',opts:["Chop etadi","Qaytaradi","Tsikl","Shart"],ans:1},
+   {type:'mcq',q:'def f(x): return x*2 — f(5)=?',opts:["10","11","9","12"],ans:0},
+   {type:'mcq',q:'Parametr va argument:',opts:["Farq yo'q","Parametr=ta'rif, argument=chaqirish","Parametr=chaqirish","Argument=ta'rif"],ans:1},
+   {type:'mcq',q:'def add(a,b): return a+b — add(3,4)=?',opts:["8","6","9","7"],ans:3},
+   {type:'mcq',q:'Default parametr:',opts:["def f(x):","def f(x=5):","def f(): x=5","def(5):"],ans:1},
+   {type:'mcq',q:'def sq(x): return x**2 — sq(4)=?',opts:["17","15","18","16"],ans:3},
+   {type:'mcq',q:'*args nima?',opts:["Bitta","Ko'p argumentlar","Kalit","Hech narsa"],ans:1},
+   {type:'mcq',q:'def f(*args): return len(args) — f(1,2,3)=?',opts:["4","2","5","3"],ans:3},
+   {type:'mcq',q:'Lambda:',opts:["Ko'p qatorli","Bir qatorli anonim","Rekursiv","Sinf"],ans:1},
+   {type:'mcq',q:'f=lambda x: x+1 — f(9)=?',opts:["11","9","10","12"],ans:2},
+   {type:'mcq',q:'Rekursiya:',opts:["Tsikl","O'zini chaqiradi","Shart","Import"],ans:1},
+   {type:'mcq',q:'def fact(n): return 1 if n==0 else n*fact(n-1) — fact(3)=?',opts:["7","6","5","8"],ans:1},
+   {type:'mcq',q:'global kalit so\'zi:',opts:["Lokal","Global o'zgaruvchi","Funksiya","Import"],ans:1},
+   {type:'mcq',q:'def f(): return 1,2 — f()=?',opts:["(1, 2)","(1, 2)!","(1, 2)?","Boshqa"],ans:0},
+   {type:'mcq',q:'**kwargs:',opts:["Argumentlar","Kalit=qiymat","Default","Lambda"],ans:1},
+   {type:'mcq',q:'sorted([3,1,2])=?',opts:['[1, 2, 3]','[3, 2, 1]','[1, 3, 2]','[2, 1, 3]'],ans:0},
+   {type:'mcq',q:'map() funksiyasi:',opts:["Filtrlash","Har elementga funksiya","Tartiblash","Qidirish"],ans:1},
+   {type:'mcq',q:'list(map(lambda x:x*2,[1,2,3]))=?',opts:['[2, 4, 6]','[1, 3, 5]','[0, 2, 4]','[2, 4, 8]'],ans:0},
+   {type:'mcq',q:'filter():',opts:["Funksiya qo'llash","Shart bo'yicha filtrlash","Tartiblash","Birlashtirish"],ans:1},
+   {type:'mcq',q:'len("python")=?',opts:["6","7","5","8"],ans:0},
+   {type:'mcq',q:'None qaytaradi:',opts:["return bor","return yo'q","Xato","Lambda"],ans:1},
+   {type:'mcq',q:'abs(-7)=?',opts:["8","6","7","9"],ans:2},
+   {type:'mcq',q:'help() nima?',opts:["O'chirish","Hujjat ko'rish","Import","Chiqish"],ans:1}
+  ]},
+  {id:5,title:'YAKUNIY TEST',desc:'Barcha mavzular • 31 savol',xp:200,isTest:true}
+ ],
+ quiz:[
+  {type:'mcq',q:'print("salom") natija:',opts:["salom","salom!","salom?","Boshqa"],ans:0},
+  {type:'mcq',q:'type(3.14):',opts:[],ans:1},
+  {type:'mcq',q:'range(5) elementlar:',opts:["6","4","5","7"],ans:2},
+  {type:'mcq',q:'def nima?',opts:[],ans:1},
+  {type:'mcq',q:'len([1,2,3,4])=?',opts:["5","4","3","6"],ans:1},
+  {type:'mcq',q:'while True:',opts:["Bir marta","Cheksiz","Hech marta","Xato"],ans:1},
+  {type:'mcq',q:'not False=?',opts:["True","False","None","1"],ans:0},
+  {type:'mcq',q:'return nima?',opts:["Chop etadi","Qaytaradi","To'xtatadi","Import"],ans:1},
+  {type:'mcq',q:'def f(x): return x**3 — f(2)=?',opts:["9","7","10","8"],ans:3},
+  {type:'mcq',q:'10 % 3=?',opts:["0","1","2","3"],ans:1},
+  {type:'mcq',q:'True and False=?',opts:["False","True","None","0"],ans:0},
+  {type:'mcq',q:'break nima?',opts:["Davom etadi","Tsikldan chiqadi","Funksiya","Xato"],ans:1},
+  {type:'mcq',q:'max([1,5,3,2])=?',opts:["6","5","4","7"],ans:1},
+  {type:'mcq',q:'lambda x: x+1 — bu:',opts:["Tsikl","Anonim funksiya","Shart","Import"],ans:1},
+  {type:'mcq',q:'sum([1,2,3,4,5])=?',opts:["16","15","14","17"],ans:1},
+  {type:'mcq',q:'*args:',opts:["False","Ko'p argument","None","Xato"],ans:1},
+  {type:'mcq',q:'sorted([5,2,8,1])=?',opts:['[1, 2, 5, 8]','[5, 2, 1, 8]','[1, 5, 2, 8]','[8, 5, 2, 1]'],ans:0},
+  {type:'mcq',q:'continue:',opts:["To'xtatadi","Keyingi iteratsiya","Chiqadi","Import"],ans:1},
+  {type:'mcq',q:'abs(-15)=?',opts:["16","14","17","15"],ans:3},
+  {type:'mcq',q:'enumerate():',opts:["Faqat qiymat","Indeks va qiymat","Faqat indeks","Uzunlik"],ans:1},
+  {type:'mcq',q:'f=lambda x,y: x+y — f(3,4)=?',opts:["8","7","6","9"],ans:1},
+  {type:'mcq',q:'bool(0)=?',opts:["True","False","None","0"],ans:1},
+  {type:'mcq',q:'list(range(1,6))=?',opts:['[1, 2, 3, 4, 5]','[5, 4, 3, 2, 1]','[0, 1, 2, 3, 4]','[1, 2, 3, 4]'],ans:0},
+  {type:'mcq',q:'map():',opts:["Filtrlash","Funksiya qo'llash","Tartiblash","Qidirish"],ans:1},
+  {type:'mcq',q:'range(0,10,2): 0,2,4,6,?',opts:["9","8","7","10"],ans:1},
+  {type:'mcq',q:'Rekursiya:',opts:["Tsikl","O'zini chaqiradi","Shart","Import"],ans:1},
+  {type:'mcq',q:'"python"[0]=?',opts:["p","p!","p?","Boshqa"],ans:0},
+  {type:'mcq',q:'filter():',opts:["Funksiya qo'llash","Shart bo'yicha filtrlash","Tartiblash","Birlashtirish"],ans:1},
+  {type:'mcq',q:'3! (faktorial) = ?',opts:["7","5","8","6"],ans:3},
+  {type:'mcq',q:'global:',opts:["Lokal","Global o'zgaruvchi","Funksiya","Import"],ans:1},
+  {type:'mcq',q:'len("dasturlash")=?',opts:["11","9","12","10"],ans:3}
+ ]}
+];
+
+// ===== PROGRESS =====
+function getP(){ try{ return JSON.parse(localStorage.getItem('ep_'+(currentUser?.id||''))||'{}'); }catch(e){return{};} }
+function saveP(p){ localStorage.setItem('ep_'+(currentUser?.id||''),JSON.stringify(p)); }
+function getCP(cid){ return getP()[cid]||{done:[],level:0,xp:0,passed:false,testPassed:false}; }
+function totalXP(){ return Object.values(getP()).reduce((s,c)=>s+(c.xp||0),0); }
+function calcLevel(xp){ return Math.floor(xp/500)+1; }
+function doneCourses(){ return Object.values(getP()).filter(c=>c.passed).length; }
+function doneTests(){ return Object.values(getP()).filter(c=>c.testPassed).length; }
+
+// ===== PARTICLES =====
+(function(){ const c=document.getElementById('particles'); for(let i=0;i<50;i++){ const p=document.createElement('div'); p.className='particle'; p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*5}s;`; c.appendChild(p); } })();
+
+if(token) checkAuth();
+
+async function checkAuth(){ try{ const r=await fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}}); if(r.ok){ const d=await r.json(); loginSuccess(d.user); } else{ token=null; localStorage.removeItem('edubot_token'); } }catch(e){} }
+
+function switchTab(t){ document.querySelectorAll('.auth-tab').forEach((b,i)=>b.classList.toggle('active',i===(t==='login'?0:1))); document.getElementById('loginForm').style.display=t==='login'?'block':'none'; document.getElementById('registerForm').style.display=t==='register'?'block':'none'; showErr(''); }
+function showErr(m){ const e=document.getElementById('authError'); e.textContent=m; e.style.display=m?'block':'none'; }
+
+async function login(){
+  const email=document.getElementById('loginEmail').value.trim(), pw=document.getElementById('loginPassword').value;
+  if(!email||!pw){showErr('Email va parolni kiriting');return;}
+  const btn=event.target; btn.disabled=true; btn.textContent='⏳...';
+  try{ const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})}); const d=await r.json(); if(!r.ok){showErr(d.message||'Xato');return;} token=d.token; localStorage.setItem('edubot_token',token); loginSuccess(d.user); }
+  catch(e){showErr('Server bilan ulanib bo\'lmadi');}
+  finally{btn.disabled=false;btn.textContent='🚀 KIRISH';}
+}
+
+async function register(){
+  const name=document.getElementById('regName').value.trim(), email=document.getElementById('regEmail').value.trim(), pw=document.getElementById('regPassword').value;
+  if(!name||!email||!pw){showErr('Barcha maydonlarni to\'ldiring');return;}
+  const btn=event.target; btn.disabled=true; btn.textContent='⏳...';
+  try{ const r=await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pw})}); const d=await r.json(); if(!r.ok){showErr(d.message||'Xato');return;} token=d.token; localStorage.setItem('edubot_token',token); loginSuccess(d.user); }
+  catch(e){showErr('Server bilan ulanib bo\'lmadi');}
+  finally{btn.disabled=false;btn.textContent="✨ RO'YXATDAN O'TISH";}
+}
+
+function loginSuccess(user){ currentUser=user; updateUI(); document.getElementById('authScreen').style.display='none'; document.getElementById('mainApp').style.display='block'; renderDash(); renderAll(); loadLB(); }
+
+function updateUI(){
+  const xp=totalXP(), lv=calcLevel(xp), dc=doneCourses(), dt=doneTests(), ini=(currentUser?.name||'U')[0].toUpperCase();
+  document.getElementById('sidebarAvatar').textContent=ini;
+  document.getElementById('sidebarName').textContent=currentUser.name;
+  document.getElementById('sidebarXP').textContent=`${xp} XP | Level ${lv}`;
+  document.getElementById('statXP').textContent=xp.toLocaleString();
+  document.getElementById('statLevel').textContent=lv;
+  document.getElementById('statCourses').textContent=`${dc}/6`;
+  document.getElementById('statTests').textContent=dt;
+  document.getElementById('profAvatar').textContent=ini;
+  document.getElementById('profName').textContent=currentUser.name;
+  document.getElementById('profEmail').textContent=currentUser.email;
+  document.getElementById('profRole').textContent=currentUser.role.toUpperCase();
+  document.getElementById('profXP').textContent=xp.toLocaleString();
+  document.getElementById('profLevel').textContent=lv;
+  if(document.getElementById('profLevelBig')) document.getElementById('profLevelBig').textContent=lv;
+  document.getElementById('profCourses').textContent=dc;
+  document.getElementById('profTests').textContent=dt;
+  // Level progress bar
+  const xpInLevel=xp%(500), pct=Math.round(xpInLevel/500*100);
+  const bar=document.getElementById('profLevelBar');
+  const nxt=document.getElementById('profNextLevel');
+  if(bar) bar.style.width=pct+'%';
+  if(nxt) nxt.textContent=`${500-xpInLevel} XP kerak`;
+  // Achievements
+  const a1=document.getElementById('ach1s');
+  const a2=document.getElementById('ach2s');
+  if(a1) a1.textContent=dc>0?'✓':'—'; if(a1&&dc>0) a1.style.color='#00ff88';
+  if(a2) a2.textContent=xp>=500?'✓':'—'; if(a2&&xp>=500) a2.style.color='#00ff88';
+}
+
+function courseCard(c){ 
+  const cp=getCP(c.id), tot=c.lessons.length, dn=cp.done.length, pct=Math.round(dn/tot*100);
+  return `<div class="course-card" onclick="openCourse(${c.id})">
+    <div class="course-thumb"><img src="${c.img}" alt="${c.title}" loading="lazy"></div>
+    <div class="course-body">
+      <div class="course-cat">${c.cat}</div>
+      <div class="course-title">${c.title}</div>
+      <div class="course-meta"><span>👨‍🏫 ${c.teacher}</span><span>🏆 ${c.xpReward} XP</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-text">${dn}/${tot} dars (${pct}%)</div>
+      <span class="level-badge">Level ${cp.level}</span>
+      ${cp.passed?'<span style="color:#00ff88;font-weight:700;margin-left:8px">✅ TUGATILDI</span>':''}
+    </div>
+  </div>`;
+}
+
+function renderDash(){ document.getElementById('dashCourses').innerHTML=COURSES.map(courseCard).join(''); }
+function renderAll(){ document.getElementById('allCourses').innerHTML=COURSES.map(courseCard).join(''); }
+
+function openCourse(cid){
+  showPage('courses',document.querySelectorAll('.nav-item')[1]);
+  const c=COURSES.find(x=>x.id===cid), cp=getCP(cid);
+  document.getElementById('coursesList').style.display='none';
+  document.getElementById('quizWrap').style.display='none';
+  const det=document.getElementById('courseDetail');
+  det.style.display='block';
+  const lessons=c.lessons.map((l,i)=>{
+    const done=cp.done.includes(l.id);
+    const locked=i>0&&!cp.done.includes(c.lessons[i-1].id);
+    const icon=done?'✅':locked?'🔒':'▶️';
+    const cls=done?'completed':locked?'locked':'';
+    const click=locked?'':`onclick="startLesson(${cid},${l.id},${l.isTest||false})"`;
+    return `<div class="lesson-item ${cls}" ${click}>
+      <div class="lesson-num">${i+1}</div>
+      <div class="lesson-info"><div class="lesson-title">${l.title}</div><div class="lesson-meta">${l.desc} • +${l.xp} XP</div></div>
+      <div class="lesson-status">${icon}</div>
+    </div>`;
+  }).join('');
+  det.innerHTML=`
+    <button class="back-btn" onclick="backToCourses()">← Orqaga</button>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:30px">
+      <img src="${c.img}" style="width:200px;height:130px;border-radius:15px;object-fit:cover">
+      <div>
+        <div style="color:#00ff88;font-size:.85rem;font-weight:700;margin-bottom:8px">${c.cat}</div>
+        <h1 style="font-size:2rem;margin-bottom:8px">${c.title}</h1>
+        <p style="color:#888">👨‍🏫 ${c.teacher} • 🏆 ${c.xpReward} XP • <span style="color:#ff00ff">Level ${cp.level}</span></p>
+        ${cp.passed?'<div style="margin-top:12px;color:#00ff88;font-size:1.1rem;font-weight:700">✅ Kurs muvaffaqiyatli tugatildi!</div>':''}
+      </div>
+    </div>
+    <div class="lesson-list">${lessons}</div>`;
+}
+
+function backToCourses(){ document.getElementById('coursesList').style.display='block'; document.getElementById('courseDetail').style.display='none'; document.getElementById('quizWrap').style.display='none'; renderAll(); renderDash(); updateUI(); }
+
+function startLesson(cid,lid,isTest){
+  if(isTest){startQuiz(cid);return;}
+  const c=COURSES.find(x=>x.id===cid), l=c.lessons.find(x=>x.id===lid);
+  if(l.lessonQuiz && l.lessonQuiz.length>0){
+    startLessonQuiz(cid,lid);
+  } else {
+    const cp=getCP(cid), p=getP();
+    if(!cp.done.includes(lid)){
+      const oldXP=totalXP();
+      cp.done.push(lid); cp.xp=(cp.xp||0)+l.xp;
+      p[cid]=cp; saveP(p);
+      const newXP=totalXP(), ol=calcLevel(oldXP), nl=calcLevel(newXP);
+      if(nl>ol) showLvlUp(nl,l.xp);
+    }
+    openCourse(cid);
+  }
+}
+
+// ===== DARS QUIZ — 5 ta 5 ta, jami 25 ta =====
+let LQ={cid:null,lid:null,allQs:[],round:0,roundQs:[],cur:0,roundScore:0,totalScore:0};
+
+function startLessonQuiz(cid,lid){
+  const c=COURSES.find(x=>x.id===cid), l=c.lessons.find(x=>x.id===lid);
+  const base=[...l.lessonQuiz].sort(()=>Math.random()-0.5);
+  const all=[];
+  while(all.length<25) for(let q of base){ if(all.length<25) all.push(q); }
+  LQ={cid,lid,allQs:all,round:0,roundQs:[],cur:0,roundScore:0,totalScore:0};
+  document.getElementById('courseDetail').style.display='none';
+  document.getElementById('quizWrap').style.display='block';
+  showRoundIntro();
+}
+
+function showRoundIntro(){
+  const r=LQ.round;
+  const cols=['#00ff88','#ff00ff','#00ccff','#ffc800','#ff6688'];
+  const emojis=['🚀','⚡','🔥','💎','🏆'];
+  const col=cols[r]; const emo=emojis[r];
+  const c=COURSES.find(x=>x.id===LQ.cid), l=c.lessons.find(x=>x.id===LQ.lid);
+  LQ.roundQs=LQ.allQs.slice(r*5, r*5+5);
+  LQ.cur=0; LQ.roundScore=0;
+
+  const dots=Array.from({length:5},(_,i)=>`
+    <div style="width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;margin:4px;
+    background:${i<r?'#00ff88':i===r?col:'rgba(255,255,255,.08)'};
+    color:${i<=r?'#000':'#555'};
+    border:2px solid ${i===r?col:'transparent'};
+    box-shadow:${i===r?'0 0 12px '+col:'none'}">${i<r?'✓':i+1}</div>`).join('');
+
+  document.getElementById('quizWrap').innerHTML=`
+    <button class="back-btn" onclick="backFromLQ()">← Bekor qilish</button>
+    <div class="quiz-wrap"><div class="quiz-box" style="text-align:center;padding:40px 30px">
+      <div style="font-size:3.5rem;margin-bottom:12px">${emo}</div>
+      <div style="color:${col};font-size:.8rem;font-weight:700;margin-bottom:6px;letter-spacing:2px">📚 ${l.title}</div>
+      <h2 style="color:${col};font-size:2.2rem;margin-bottom:6px;font-weight:900">${r+1}-RAUND</h2>
+      <div style="color:#777;font-size:.85rem;margin-bottom:20px">5 ta savoldan kamida 3 tasini to'g'ri javoblang</div>
+      <div style="margin-bottom:25px">${dots}</div>
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:12px;margin-bottom:25px;color:#888;font-size:.85rem">
+        Jami progress: <span style="color:${col};font-weight:700">${LQ.totalScore}/${r*5} ball</span>
+      </div>
+      <button class="daxshat-btn" style="max-width:200px" onclick="renderRoundQ()">▶ BOSHLASH</button>
+    </div></div>`;
+}
+
+function renderRoundQ(){
+  const q=LQ.roundQs[LQ.cur];
+  const pct=(LQ.cur/5)*100;
+  const cols=['#00ff88','#ff00ff','#00ccff','#ffc800','#ff6688'];
+  const col=cols[LQ.round];
+  const c=COURSES.find(x=>x.id===LQ.cid), l=c.lessons.find(x=>x.id===LQ.lid);
+  const labels=['A','B','C','D'];
+  document.getElementById('quizWrap').innerHTML=`
+    <button class="back-btn" onclick="backFromLQ()">← Bekor qilish</button>
+    <div class="quiz-wrap"><div class="quiz-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="color:${col};font-size:.8rem;font-weight:700">${LQ.round+1}-raund • ${l.title}</span>
+        <span style="color:#888;font-size:.8rem">⭐ ${LQ.roundScore}/5</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;color:#666;font-size:.8rem">
+        <span>Savol ${LQ.cur+1}/5</span>
+        <span>Jami: ${LQ.totalScore} ball</span>
+      </div>
+      <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="quiz-q" style="margin:20px 0">${q.q}</div>
+      <div class="quiz-opts">
+        ${q.opts.map((o,i)=>`
+          <button class="quiz-opt" onclick="checkRoundMCQ(${i})" style="text-align:left;display:flex;align-items:center;gap:10px">
+            <span style="min-width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem">${labels[i]}</span>
+            <span>${o}</span>
+          </button>`).join('')}
+      </div>
+    </div></div>`;
+}
+
+function checkRoundMCQ(sel){
+  const q=LQ.roundQs[LQ.cur];
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');
+  if(sel!==q.ans){ document.querySelectorAll('.quiz-opt')[sel].classList.add('wrong'); }
+  else { LQ.roundScore++; LQ.totalScore++; }
+  setTimeout(()=>{ LQ.cur++; if(LQ.cur<5) renderRoundQ(); else showRoundResult(); }, 900);
+}
+
+function showRoundResult(){
+  const sc=LQ.roundScore, pass=sc>=3;
+  const isLast=(LQ.round>=4);
+  const cols=['#00ff88','#ff00ff','#00ccff','#ffc800','#ff6688'];
+  const col=cols[LQ.round];
+
+  if(!pass){
+    document.getElementById('quizWrap').innerHTML=`
+      <div class="quiz-wrap"><div class="quiz-box" style="text-align:center;padding:40px 30px">
+        <div style="font-size:3rem">😔</div>
+        <h2 style="color:#ff4444;font-size:1.8rem;margin:15px 0">${LQ.round+1}-RAUND OTMADI</h2>
+        <div class="score-num" style="color:#ff4444">${sc}/5</div>
+        <div class="xp-box" style="margin:15px 0">Kamida 3 ta to'g'ri javob kerak edi!<br>Qaytadan urining 💪</div>
+        <button class="daxshat-btn" style="max-width:200px" onclick="retryRound()">🔄 Qaytadan</button>
+      </div></div>`;
+    return;
+  }
+
+  if(isLast){ showFinalResult(); return; }
+
+  document.getElementById('quizWrap').innerHTML=`
+    <div class="quiz-wrap"><div class="quiz-box" style="text-align:center;padding:40px 30px">
+      <div style="font-size:3rem">🎉</div>
+      <h2 style="color:${col};font-size:1.8rem;margin:15px 0">${LQ.round+1}-RAUND OTDI!</h2>
+      <div class="score-num" style="color:${col}">${sc}/5</div>
+      <div class="xp-box" style="margin:15px 0">Jami: <strong>${LQ.totalScore}/${(LQ.round+1)*5}</strong> ball ✅</div>
+      <div style="margin:15px 0">
+        ${Array.from({length:5},(_,i)=>`<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;margin:3px;font-weight:700;font-size:.8rem;background:${i<=LQ.round?'#00ff88':'rgba(255,255,255,.08)'};color:${i<=LQ.round?'#000':'#555'}">${i<=LQ.round?'✓':i+1}</span>`).join('')}
+      </div>
+      <button class="daxshat-btn" style="max-width:220px" onclick="nextRound()">${LQ.round+2}-RAUND ▶</button>
+    </div></div>`;
+}
+
+function retryRound(){
+  const base=[...COURSES.find(x=>x.id===LQ.cid).lessons.find(x=>x.id===LQ.lid).lessonQuiz].sort(()=>Math.random()-0.5);
+  LQ.roundQs=base.slice(0,5);
+  LQ.cur=0; LQ.roundScore=0;
+  renderRoundQ();
+}
+
+function nextRound(){ LQ.round++; showRoundIntro(); }
+
+function showFinalResult(){
+  const c=COURSES.find(x=>x.id===LQ.cid), l=c.lessons.find(x=>x.id===LQ.lid);
+  let xp=0;
+  const cp=getCP(LQ.cid), p=getP();
+  if(!cp.done.includes(LQ.lid)){
+    const oldXP=totalXP();
+    xp=l.xp; cp.done.push(LQ.lid); cp.xp=(cp.xp||0)+xp;
+    p[LQ.cid]=cp; saveP(p);
+    const newXP=totalXP(), ol=calcLevel(oldXP), nl=calcLevel(newXP);
+    setTimeout(()=>{ if(nl>ol) showLvlUp(nl,xp); },600);
+  }
+  updateUI();
+  document.getElementById('quizWrap').innerHTML=`
+    <div class="quiz-wrap"><div class="quiz-box" style="text-align:center;padding:40px 30px">
+      <div style="font-size:3.5rem">🏆</div>
+      <h2 class="neon-text" style="font-size:2rem;margin:15px 0">DARS YAKUNLANDI!</h2>
+      <div class="score-num" style="color:#00ff88">${LQ.totalScore}/25</div>
+      <div class="xp-box" style="margin:15px 0">🏆 <strong>+${xp>0?xp:'(oldindan olindi)'} XP</strong> qo'shildi!</div>
+      <div style="margin:15px 0">
+        ${Array.from({length:5},(_,i)=>`<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;margin:3px;font-weight:700;font-size:.8rem;background:#00ff88;color:#000">✓</span>`).join('')}
+        <div style="color:#00ff88;font-size:.85rem;margin-top:8px">Barcha 5 raund muvaffaqiyatli! 🎊</div>
+      </div>
+      <button class="daxshat-btn" style="max-width:220px" onclick="openCourse(${LQ.cid})">📚 Kursga qaytish</button>
+    </div></div>`;
+}
+
+function backFromLQ(){ openCourse(LQ.cid); }
+
+// ===== QUIZ =====
+let Q={cid:null,qs:[],cur:0,score:0};
+
+function startQuiz(cid){ const c=COURSES.find(x=>x.id===cid); Q={cid,qs:c.quiz,cur:0,score:0}; document.getElementById('courseDetail').style.display='none'; document.getElementById('quizWrap').style.display='block'; renderQ(); }
+
+function renderQ(){
+  const q=Q.qs[Q.cur], tot=Q.qs.length, pct=(Q.cur/tot)*100;
+  const wrap=document.getElementById('quizWrap');
+  if(q.type==='input'){
+    wrap.innerHTML=`
+      <button class="back-btn" onclick="backFromQuiz()">← Bekor qilish</button>
+      <div class="quiz-wrap"><div class="quiz-box">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;color:#888"><span>Savol ${Q.cur+1}/${tot}</span><span>⭐ ${Q.score}/${tot}</span></div>
+        <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="quiz-hint">💡 Maslahat: ${q.hint}</div>
+        <div class="quiz-input-wrap">
+          <input class="quiz-input" id="qInput" placeholder="Javobingizni kiriting..." onkeydown="if(event.key==='Enter')checkInput()">
+          <button class="quiz-submit" onclick="checkInput()">✓ TEKSHIR</button>
+        </div>
+        <div class="quiz-feedback" id="qFeedback"></div>
+        <button class="quiz-next" id="qNext" onclick="nextQ()">Keyingi savol →</button>
+      </div></div>`;
+    setTimeout(()=>document.getElementById('qInput')?.focus(),100);
+  } else {
+    wrap.innerHTML=`
+      <button class="back-btn" onclick="backFromQuiz()">← Bekor qilish</button>
+      <div class="quiz-wrap"><div class="quiz-box">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;color:#888"><span>Savol ${Q.cur+1}/${tot}</span><span>⭐ ${Q.score}/${tot}</span></div>
+        <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="quiz-opts">
+          ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="checkMCQ(${i})">${o}</button>`).join('')}
+        </div>
+      </div></div>`;
+  }
+}
+
+function checkInput(){
+  const inp=document.getElementById('qInput'), val=inp.value.trim(), q=Q.qs[Q.cur];
+  if(!val) return;
+  inp.disabled=true;
+  document.querySelector('.quiz-submit').disabled=true;
+  const correct=q.accept.some(a=>String(a).toLowerCase()===val.toLowerCase());
+  const fb=document.getElementById('qFeedback');
+  if(correct){ Q.score++; fb.className='quiz-feedback ok'; fb.textContent=`✅ To'g'ri! Javob: ${q.ans}`; }
+  else { fb.className='quiz-feedback fail'; fb.textContent=`❌ Noto'g'ri! To'g'ri javob: ${q.ans}`; }
+  fb.style.display='block';
+  document.getElementById('qNext').style.display='block';
+}
+
+function checkMCQ(sel){
+  const q=Q.qs[Q.cur]; 
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');
+  if(sel!==q.ans) document.querySelectorAll('.quiz-opt')[sel].classList.add('wrong');
+  else Q.score++;
+  setTimeout(nextQ,900);
+}
+
+function nextQ(){ Q.cur++; if(Q.cur<Q.qs.length) renderQ(); else showResult(); }
+
+function showResult(){
+  const tot=Q.qs.length, sc=Q.score, pass=sc>=Math.ceil(tot*0.6);
+  const c=COURSES.find(x=>x.id===Q.cid), cp=getCP(Q.cid), p=getP();
+  const testLesson=c.lessons[c.lessons.length-1];
+  
+  if(pass){
+    const oldXP=totalXP();
+    cp.testPassed=true; cp.passed=true;
+    cp.xp=(cp.xp||0)+testLesson.xp;
+    cp.level=(cp.level||0)+1;
+    if(!cp.done.includes(testLesson.id)) cp.done.push(testLesson.id);
+    p[Q.cid]=cp; saveP(p);
+    const newXP=totalXP(), ol=calcLevel(oldXP), nl=calcLevel(newXP);
+    setTimeout(()=>{ if(nl>ol) showLvlUp(nl,testLesson.xp); },500);
+  } else {
+    // Faqat YAKUNIY TEST darsi 0 ga qaytadi, boshqa darslar saqlanadi
+    cp.done=cp.done.filter(id=>id!==testLesson.id);
+    cp.testPassed=false; cp.passed=false;
+    p[Q.cid]=cp; saveP(p);
+  }
+  updateUI();
+
+  document.getElementById('quizWrap').innerHTML=`
+    <div class="quiz-wrap"><div class="quiz-box">
+      <div class="quiz-result">
+        <div class="big-emoji">${pass?'🎉':'😔'}</div>
+        <h2 class="neon-text" style="font-size:2rem">${pass?'MUVAFFAQIYAT!':'MUVAFFAQIYATSIZ'}</h2>
+        <div class="score-num" style="color:${pass?'#00ff88':'#ff4444'}">${sc}/${tot}</div>
+        <div class="xp-box">
+          ${pass
+            ? `🏆 <strong>+${testLesson.xp} XP</strong> olindi! Level ${cp.level} ga o'tdingiz!`
+            : `❌ O'tish uchun kamida ${Math.ceil(tot*0.6)} ta to'g'ri javob kerak edi.<br><br>⚠️ Faqat yakuniy test 0 ga qaytdi — boshqa darslaringiz saqlanib qoldi!`}
+        </div>
+        <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+          ${pass
+            ? `<button class="daxshat-btn" style="max-width:220px" onclick="backToCourses()">🏠 Kurslarga qaytish</button>`
+            : `<button class="daxshat-btn" style="max-width:220px" onclick="startQuiz(${Q.cid})">🔄 Qaytadan urinish</button>
+               <button class="daxshat-btn" style="max-width:220px;background:rgba(0,255,136,.2);color:#00ff88" onclick="openCourse(${Q.cid})">📚 Darslarni ko'rish</button>`}
+        </div>
+      </div>
+    </div></div>`;
+}
+
+function backFromQuiz(){ openCourse(Q.cid); }
+
+// ===== LEVEL UP =====
+function showLvlUp(lv,xp){ document.getElementById('lvlText').textContent=`Tabriklaymiz! Siz ${lv}-level ga o'tdingiz!`; document.getElementById('lvlXP').textContent=`+${xp} XP qo'shildi 🎊`; document.getElementById('lvlOverlay').style.display='block'; document.getElementById('lvlPopup').style.display='block'; }
+function closeLvl(){ document.getElementById('lvlOverlay').style.display='none'; document.getElementById('lvlPopup').style.display='none'; }
+
+function logout(){ token=null; localStorage.removeItem('edubot_token'); currentUser=null; document.getElementById('mainApp').style.display='none'; document.getElementById('authScreen').style.display='flex'; }
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='courses') backToCourses();
+  if(id==='admin') loadAdmin();
+  if(id==='leaderboard') loadLB();
+}
+
+async function loadLB(){
+  try{
+    const r=await fetch(`${API}/users/leaderboard`,{headers:{Authorization:`Bearer ${token}`}});
+    if(!r.ok) throw new Error('server');
+    const d=await r.json();
+    const allUsers=(d.users||[]).sort((a,b)=>b.xp-a.xp);
+    const medals=['🥇','🥈','🥉'], rc=['r1','r2','r3'];
+    const me=currentUser?.email;
+    const myRank=allUsers.findIndex(u=>u.email===me);
+    if(document.getElementById('profRank') && myRank>=0) document.getElementById('profRank').textContent=(myRank+1)+'-o\'rin ('+allUsers.length+' ichida)';
+    if(!allUsers.length){ document.getElementById('lbList').innerHTML='<div style="padding:40px;text-align:center;color:#555">Hali foydalanuvchi yoq</div>'; return; }
+    document.getElementById('lbList').innerHTML=allUsers.map((u,i)=>{
+      const isMe=u.email===me;
+      const bgColors=['linear-gradient(135deg,#ffaa00,#ff6600)','linear-gradient(135deg,#aaa,#666)','linear-gradient(135deg,#cd7f32,#8b4513)'];
+      const avatarBg=isMe?'linear-gradient(135deg,#00ff88,#00ccff)':i<3?bgColors[i]:'linear-gradient(135deg,#555,#333)';
+      const roleColor=u.role==='admin'?'#ff4444':u.role==='teacher'?'#ffc800':'#00ccff';
+      return `<div class="lb-item" style="padding:18px 25px;${isMe?'background:linear-gradient(90deg,rgba(0,255,136,.12),transparent);border-left:4px solid #00ff88;':''}">
+        <div class="lb-rank ${rc[i]||''}" style="width:45px;font-size:${i<3?'2rem':'1.3rem'};font-weight:900">${medals[i]||i+1}</div>
+        <div style="width:50px;height:50px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1.3rem;flex-shrink:0;${isMe?'box-shadow:0 0 20px rgba(0,255,136,.5);border:2px solid #00ff88':''};">${u.name[0]}</div>
+        <div class="lb-name" style="flex:1">
+          <div style="font-weight:800;font-size:1rem${isMe?';color:#00ff88':''}">
+            ${isMe?'<span style="background:rgba(0,255,136,.15);border:1px solid #00ff88;border-radius:8px;padding:2px 8px;font-size:.75rem;margin-right:6px">SEN</span>':''}
+            ${u.name}${i===0?' 👑':''}
+            <span style="font-size:.7rem;font-weight:600;color:${roleColor};margin-left:6px;opacity:.8">${u.role.toUpperCase()}</span>
+          </div>
+          <div style="color:#555;font-size:.8rem;margin-top:3px">Level ${calcLevel(u.xp)} • ${i+1}-orin</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:900;font-size:1.1rem;color:${isMe?'#00ff88':i===0?'gold':i===1?'silver':i===2?'#cd7f32':'#aaa'}">${u.xp.toLocaleString()}</div>
+          <div style="font-size:.75rem;color:#555">XP</div>
+        </div>
+      </div>`;}).join('');
+  }catch(e){ document.getElementById('lbList').innerHTML='<div style="padding:40px;text-align:center;color:#ff4444">⚠️ Yuklab bolmadi. Serverni tekshiring.</div>'; }
+}
+
+async function loadAdmin(){
+  try{
+    const r=await fetch(`${API}/users/leaderboard`,{headers:{Authorization:`Bearer ${token}`}});
+    const d=await r.json();
+    const users=d.users||[];
+    const totalXPAll=users.reduce((s,u)=>s+u.xp,0);
+    const top=users[0];
+    document.getElementById('adminUsers').textContent=users.length;
+    document.getElementById('adminTotalXP').textContent=totalXPAll.toLocaleString()+' XP';
+    document.getElementById('adminTopUser').textContent=top?top.name+' ('+top.xp.toLocaleString()+' XP)':'-';
+    const rows=users.map((u,i)=>{
+      const lv=calcLevel(u.xp);
+      const roleColor=u.role==='admin'?'#ff4444':u.role==='teacher'?'#ffc800':'#00ff88';
+      return `<div style="display:flex;align-items:center;gap:15px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);transition:.2s" onmouseover="this.style.background='rgba(0,255,136,.04)'" onmouseout="this.style.background='transparent'">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#ff00ff);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1rem;flex-shrink:0">${u.name[0]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:.95rem">${u.name}</div>
+          <div style="color:#555;font-size:.78rem">${u.email}</div>
+        </div>
+        <div style="text-align:center;min-width:70px">
+          <div style="color:${roleColor};font-size:.75rem;font-weight:700;background:${roleColor}22;border-radius:6px;padding:2px 8px">${u.role.toUpperCase()}</div>
+        </div>
+        <div style="text-align:center;min-width:60px">
+          <div style="color:#ff00ff;font-weight:700">Lv.${lv}</div>
+          <div style="color:#555;font-size:.75rem">Level</div>
+        </div>
+        <div style="text-align:center;min-width:80px">
+          <div style="color:#00ff88;font-weight:900">${u.xp.toLocaleString()}</div>
+          <div style="color:#555;font-size:.75rem">XP</div>
+        </div>
+        <div style="text-align:center;min-width:50px">
+          <div style="color:#ffc800;font-weight:700">${i+1}</div>
+          <div style="color:#555;font-size:.75rem">O'rin</div>
+        </div>
+      </div>`;}).join('');
+    document.getElementById('adminUserList').innerHTML=rows||'<div style="padding:30px;text-align:center;color:#555">Malumot topilmadi</div>';
+  }catch(e){
+    document.getElementById('adminUserList').innerHTML='<div style="padding:30px;text-align:center;color:#ff4444">Server bilan ulanib bolmadi</div>';
+  }
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('chatInput'), txt=inp.value.trim(); if(!txt) return; inp.value='';
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="msg user"><div class="msg-avatar user">${(currentUser?.name||'U')[0]}</div><div class="msg-bubble">${esc(txt)}</div></div>`;
+  const tid='t'+Date.now();
+  msgs.innerHTML+=`<div class="msg ai" id="${tid}"><div class="msg-avatar ai">🤖</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  chatHistory.push({role:'user',content:txt});
+  try{
+    const r=await fetch(`${API}/ai/chat`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({message:txt,history:chatHistory.slice(-10)})});
+    const d=await r.json(); document.getElementById(tid)?.remove();
+    if(!r.ok){ msgs.innerHTML+=`<div class="msg ai"><div class="msg-avatar ai">🤖</div><div class="msg-bubble" style="color:#ff6666">❌ ${d.message||'Xato'}</div></div>`; }
+    else{ chatHistory.push({role:'assistant',content:d.reply}); msgs.innerHTML+=`<div class="msg ai"><div class="msg-avatar ai">🤖</div><div class="msg-bubble">${esc(d.reply)}</div></div>`; }
+  }catch(e){ document.getElementById(tid)?.remove(); msgs.innerHTML+=`<div class="msg ai"><div class="msg-avatar ai">🤖</div><div class="msg-bubble" style="color:#ff6666">❌ Server bilan ulanib bolmadi</div></div>`; }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+</script>
+</body>
+</html>
